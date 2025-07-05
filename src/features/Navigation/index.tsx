@@ -95,7 +95,7 @@ export const Navigation = () => {
   };
 
   return (
-    <>
+    <div className="pt-2">
       <Tabs value={value} onValueChange={handleTabChange}>
         <TabItem
           value="home"
@@ -122,6 +122,6 @@ export const Navigation = () => {
           aria-label={getAriaLabel("profile")}
         />
       </Tabs>
-    </>
+    </div>
   );
 };

@@ -6,7 +6,7 @@ import { MOCK_CAMPAIGNS } from "@/entities/campaign";
 import Image from "next/image";
 import CampaignList from "@/features/CampaignList";
 import { Tabs, TabItem } from "@worldcoin/mini-apps-ui-kit-react";
-import { CheckSquare, Star } from "iconoir-react";
+import { CheckSquare, Donate } from "iconoir-react";
 
 interface RegionDetailProps {
   region: DisasterLocation;
@@ -72,7 +72,7 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
           <TabItem
             value="active-campaigns"
             label="Active Campaigns"
-            icon={<Star />}
+            icon={<Donate />}
           />
           <TabItem
             value="completed-campaigns"
