@@ -41,7 +41,7 @@ const CampaignDetailPage = () => {
     <UserRoleProvider>
       <Page.Header>
         <Button
-          onClick={() => router.back()}
+          onClick={handleBack}
           aria-label="Go back"
           size="icon"
           variant="secondary"
@@ -64,7 +64,7 @@ const CampaignDetailPage = () => {
             </div>
           </div>
         ) : (
-          <CampaignDetail campaignId={campaignId} />
+          <CampaignDetail onBack={handleBack} campaignId={campaignId} />
         )}
       </Page.Main>
     </UserRoleProvider>

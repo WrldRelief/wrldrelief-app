@@ -1,10 +1,7 @@
 "use client";
 
 import { DisasterLocation } from "@/entities/disaster";
-import {
-  getDisasterIcon,
-  getUrgencyColorClass,
-} from "@/features/DisasterDisplay";
+import { getUrgencyColorClass } from "@/features/DisasterDisplay";
 import { usePagination } from "@/features/DisasterPagination";
 import { ListItem } from "@worldcoin/mini-apps-ui-kit-react";
 import React from "react";
@@ -46,11 +43,11 @@ export const DisasterList: React.FC<DisasterListProps> = ({
             key={disaster.id}
             label={disaster.name}
             description={disaster.description}
-            startAdornment={
-              <div className="text-2xl" aria-hidden="true">
-                {getDisasterIcon(disaster.type)}
-              </div>
-            }
+            // startAdornment={
+            //   <div className="text-2xl" aria-hidden="true">
+            //     {getDisasterIcon(disaster.type)}
+            //   </div>
+            // }
             endAdornment={
               <div className="flex flex-col items-end">
                 <span

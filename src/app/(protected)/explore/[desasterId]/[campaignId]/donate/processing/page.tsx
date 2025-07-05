@@ -1,33 +1,32 @@
 "use client";
 
-import { DonationAmountSelector } from "@/features/donation/ui/DonationAmountSelector";
+import { TransactionProcessing } from "@/features/donation/ui/TransactionProcessing";
 import { DonationLayout } from "@/features/donation/ui/DonationLayout";
 import { useDonation } from "@/features/donation/model/DonationContext";
-import { useRouter } from "next/navigation";
 import { MOCK_CAMPAIGNS } from "@/entities/campaign";
 
-const DonatePage = () => {
-  const { donationState, goToStep } = useDonation();
-  const router = useRouter();
+const ProcessingPage = () => {
+  const { donationState } = useDonation();
   const campaign = MOCK_CAMPAIGNS.find((c) => c.id === donationState.campaignId);
   
   if (!campaign) return null;
-  
+
+  // No back button during processing
   const handleBack = () => {
-    router.push(`/explore/${donationState.disasterId}/${donationState.campaignId}`);
+    // No-op - we don't want users to go back during processing
   };
 
   return (
     <DonationLayout 
-      title="Select Amount"
-      step={1}
+      title="Processing"
+      step={3}
       totalSteps={3}
       onBack={handleBack}
       campaignName={campaign.name}
     >
-      <DonationAmountSelector />
+      <TransactionProcessing />
     </DonationLayout>
   );
 };
 
-export default DonatePage;
+export default ProcessingPage;

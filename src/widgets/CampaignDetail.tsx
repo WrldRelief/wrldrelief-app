@@ -172,7 +172,7 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
   console.log("campaign", campaign);
 
   return (
-    <div className="flex flex-col w-full max-w-2xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="flex flex-col w-full max-w-2xl mx-auto bg-white rounded-lg shadow-md">
       {/* Campaign header */}
       <div className="p-6 border-b">
         <h1 className="text-2xl font-bold text-gray-900">
@@ -357,208 +357,56 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
         </div>
       ) : null}
 
-      {/* USDC Donation Section */}
-      <div className="p-6 border-b bg-blue-50 rounded-lg my-4 mx-2">
-        <h2 className="text-xl font-semibold mb-4 text-center">
-          Support This Campaign
-        </h2>
+      {/* Make a Donation Section */}
+      <div className="p-6 border-t mt-4">
+        <h2 className="text-xl font-semibold mb-4">Make a Donation</h2>
 
-        {donationStep === "amount" && (
-          <div className="space-y-6">
-            {/* Donation amount selection */}
-            <div>
-              <p className="text-sm text-gray-700 mb-3 font-medium">
-                Select donation amount (USDC)
-              </p>
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                {[10, 50, 100].map((amount) => (
-                  <Button
-                    key={amount}
-                    variant={
-                      donationAmount === amount && !customAmount
-                        ? "primary"
-                        : "secondary"
-                    }
-                    onClick={() => handleDonationAmountSelect(amount)}
-                    className="py-3"
-                  >
-                    {amount} USDC
-                  </Button>
-                ))}
-              </div>
+        <div className="flex flex-col items-center gap-4">
+          <p className="text-gray-700 mb-6">
+            Your donation helps provide essential resources to those affected by
+            this disaster. All donations are processed securely through
+            blockchain technology for maximum transparency.
+          </p>
 
-              {/* Custom amount input */}
-              <div className="relative mt-4">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-gray-500 font-medium">USDC</span>
-                </div>
-                <input
-                  type="text"
-                  placeholder="Enter custom amount"
-                  value={customAmount}
-                  onChange={handleCustomAmountChange}
-                  className="block w-full pl-16 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  aria-label="Custom donation amount"
-                />
-              </div>
-            </div>
+          <Button
+            className="w-full py-3"
+            onClick={() =>
+              router.push(
+                `/explore/${enhancedCampaign.disasterId}/${enhancedCampaign.id}/donate`
+              )
+            }
+            size="lg"
+            aria-label="Donate to this campaign"
+          >
+            Donate Now
+          </Button>
 
-            {/* Donation button */}
-            <Button
-              className="w-full py-4 text-lg font-medium"
-              onClick={handleDonate}
-              disabled={!donationAmount || donationAmount <= 0}
-              size="lg"
-            >
-              Donate {donationAmount} USDC
-            </Button>
-
-            {/* Info section */}
-            <div className="bg-gray-50 p-4 rounded-lg mt-4">
-              <div className="flex items-center mb-2">
-                <svg
-                  className="w-5 h-5 text-blue-500 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-                <h3 className="font-medium text-gray-700">
-                  About USDC Donations
-                </h3>
-              </div>
-              <p className="text-sm text-gray-600">
-                USDC is a stablecoin pegged to the US dollar, allowing for
-                secure and transparent donations. Your contribution will be
-                recorded on the blockchain and directly transferred to the
-                campaign.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {donationStep === "confirm" && (
-          <div className="space-y-6">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="flex items-center mb-2">
-                <svg
-                  className="w-5 h-5 text-blue-500 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-                <h3 className="font-medium text-blue-700">Wallet Connected</h3>
-              </div>
-              <p className="text-sm text-blue-600 mb-2">
-                Connected as: {formatWalletAddress(walletAddress)}
-              </p>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-medium text-gray-700 mb-4">
-                Donation Summary
-              </h3>
-              <div className="flex justify-between mb-2">
-                <span className="text-gray-600">Amount:</span>
-                <span className="font-medium">{donationAmount} USDC</span>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span className="text-gray-600">Gas fee (estimated):</span>
-                <span className="font-medium">0.001 ETH</span>
-              </div>
-              <div className="border-t border-gray-200 my-2 pt-2 flex justify-between">
-                <span className="text-gray-700 font-medium">Total:</span>
-                <span className="font-bold">
-                  {donationAmount} USDC + 0.001 ETH
-                </span>
-              </div>
-            </div>
-
-            <div className="flex space-x-3">
-              <Button
-                variant="tertiary"
-                onClick={resetDonation}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleDonate} className="flex-1">
-                Confirm Donation
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {donationStep === "processing" && (
-          <div className="flex flex-col items-center justify-center py-10">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-            <h3 className="text-lg font-medium text-gray-800 mb-2">
-              Processing Your Donation
-            </h3>
-            <p className="text-gray-600 text-center">
-              Please wait while your transaction is being processed on the
-              blockchain. This may take a moment.
-            </p>
-          </div>
-        )}
-
-        {donationStep === "success" && (
-          <div className="flex flex-col items-center justify-center py-6">
-            <div className="bg-green-100 rounded-full p-3 mb-4">
+          {/* Info section */}
+          <div className="bg-gray-50 p-4 rounded-lg mt-4">
+            <div className="flex items-center mb-2">
               <svg
-                className="w-10 h-10 text-green-500"
+                className="w-5 h-5 text-blue-500 mr-2"
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
                   clipRule="evenodd"
                 ></path>
               </svg>
+              <h3 className="font-medium text-gray-700">
+                About USDC Donations
+              </h3>
             </div>
-            <h3 className="text-lg font-medium text-gray-800 mb-2">
-              Donation Successful!
-            </h3>
-            <p className="text-gray-600 text-center mb-6">
-              Thank you for your donation of {donationAmount} USDC to support
-              this campaign.
+            <p className="text-sm text-gray-600">
+              USDC is a stablecoin pegged to the US dollar, allowing for secure
+              and transparent donations. Your contribution will be recorded on
+              the blockchain and directly transferred to the campaign.
             </p>
-
-            <div className="bg-gray-50 p-4 rounded-lg w-full mb-6">
-              <h4 className="font-medium text-gray-700 mb-2">
-                Transaction Details
-              </h4>
-              <div className="flex justify-between mb-1 text-sm">
-                <span className="text-gray-600">Transaction ID:</span>
-                <span className="font-mono">
-                  0x{Math.random().toString(16).substring(2, 10)}...
-                  {Math.random().toString(16).substring(2, 6)}
-                </span>
-              </div>
-              <div className="flex justify-between mb-1 text-sm">
-                <span className="text-gray-600">Status:</span>
-                <span className="text-green-600">Confirmed</span>
-              </div>
-            </div>
-
-            <Button onClick={resetDonation} variant="tertiary">
-              Make Another Donation
-            </Button>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Donation transparency section */}

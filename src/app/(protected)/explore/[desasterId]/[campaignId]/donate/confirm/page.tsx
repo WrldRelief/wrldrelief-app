@@ -1,33 +1,31 @@
 "use client";
 
-import { DonationAmountSelector } from "@/features/donation/ui/DonationAmountSelector";
+import { TransactionConfirm } from "@/features/donation/ui/TransactionConfirm";
 import { DonationLayout } from "@/features/donation/ui/DonationLayout";
 import { useDonation } from "@/features/donation/model/DonationContext";
-import { useRouter } from "next/navigation";
 import { MOCK_CAMPAIGNS } from "@/entities/campaign";
 
-const DonatePage = () => {
+const ConfirmPage = () => {
   const { donationState, goToStep } = useDonation();
-  const router = useRouter();
   const campaign = MOCK_CAMPAIGNS.find((c) => c.id === donationState.campaignId);
   
   if (!campaign) return null;
   
   const handleBack = () => {
-    router.push(`/explore/${donationState.disasterId}/${donationState.campaignId}`);
+    goToStep("amount");
   };
 
   return (
     <DonationLayout 
-      title="Select Amount"
-      step={1}
+      title="Confirm Transaction"
+      step={2}
       totalSteps={3}
       onBack={handleBack}
       campaignName={campaign.name}
     >
-      <DonationAmountSelector />
+      <TransactionConfirm />
     </DonationLayout>
   );
 };
 
-export default DonatePage;
+export default ConfirmPage;
