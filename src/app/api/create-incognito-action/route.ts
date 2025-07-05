@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // Worldcoin API 엔드포인트
-// const WORLDCOIN_API_BASE = "https://developer.worldcoin.org/api/v1";
+const WORLDCOIN_API_BASE = "https://developer.worldcoin.org/api/v1";
 
 /**
  * 캠페인별 Incognito Action을 자동으로 생성하는 API

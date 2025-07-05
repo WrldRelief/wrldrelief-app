@@ -1,75 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
+import { verifyCloudProof, IVerifyResponse, ISuccessResult } from "@worldcoin/minikit-js";
 
-// Define the types for verification based on the actual package
-interface VerificationResult {
-  success: boolean;
-  nullifier_hash?: string;
-  action?: string;
+interface IRequestPayload {
+  payload: ISuccessResult;
+  action: string;
   signal?: string;
 }
 
-// // Define the payload structure from MiniKit verify API
-// interface MiniKitPayload {
-//   status: string;
-//   nullifier_hash?: string;
-//   merkle_root?: string;
-//   proof?: string;
-//   verification_level?: string;
-// }
-
 /**
  * API route to verify Worldcoin Incognito Actions proofs
+ * Based on verify.md reference implementation
  *
  * @param req - The incoming request containing the proof and action
  * @returns NextResponse with verification result
  */
 export async function POST(req: NextRequest) {
   try {
-    // Handle both IDKit and MiniKit payload formats
-    const body = await req.json();
-    let proofData, actionId;
+    // Parse request payload according to reference implementation
+    const { payload, action, signal } = await req.json() as IRequestPayload;
+    
+    // Get app_id from environment variables
+    const app_id = process.env.NEXT_PUBLIC_APP_ID as `app_${string}` || 
+                  "app_staging_d4f9c8c1c1f0c0a0c0a0c0a0c0a0c0a0" as `app_${string}`;
+    
+    // Use verifyCloudProof as per reference implementation
+    const verifyRes = await verifyCloudProof(payload, app_id, action, signal) as IVerifyResponse;
 
-    // Check if this is a MiniKit payload format
-    if (body.payload) {
-      const { payload, action } = body;
-      proofData = payload;
-      actionId = action;
+    if (verifyRes.success) {
+      // This is where you should perform backend actions if the verification succeeds
+      // Such as, setting a user as "verified" in a database
+      return NextResponse.json({ verifyRes, status: 200 });
     } else {
-      // Legacy IDKit format
-      const { proof, action } = body;
-      proofData = proof;
-      actionId = action;
+      // This is where you should handle errors from the World ID /verify endpoint.
+      // Usually these errors are due to a user having already verified.
+      return NextResponse.json({ verifyRes, status: 400 });
     }
-
-    // Verify the proof with Worldcoin's API using fetch
-    const response = await fetch(
-      "https://developer.worldcoin.org/api/v1/verify",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          proof: proofData,
-          action: actionId,
-          app_id:
-            process.env.NEXT_PUBLIC_APP_ID ||
-            "app_staging_d4f9c8c1c1f0c0a0c0a0c0a0c0a0c0a0",
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Verification failed with status: ${response.status}`);
-    }
-
-    const verifyRes: VerificationResult = await response.json();
-
-    // Return the verification result
-    return NextResponse.json({
-      success: true,
-      verification: verifyRes,
-    });
   } catch (error) {
     console.error("Error verifying proof:", error);
     return NextResponse.json(
