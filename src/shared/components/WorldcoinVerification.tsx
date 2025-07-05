@@ -148,6 +148,29 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
     }
   };
 
+  // Ensure we have a valid action ID before verification
+  const ensureActionId = async (): Promise<string> => {
+    // If we already have an action ID, use it
+    if (actionId) return actionId;
+    
+    console.log("No action ID found, creating a new one...");
+    try {
+      // Create a new Incognito Action
+      const action = await createIncognitoAction(
+        campaignId,
+        `Campaign ${campaignId} Verification for ${userRole}`,
+        `Verify ${userRole} for campaign ${campaignId}`
+      );
+      
+      console.log("Created new action:", action);
+      setActionId(action.id);
+      return action.id;
+    } catch (error) {
+      console.error("Failed to create action:", error);
+      throw new Error(`Failed to create Incognito Action: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
   // Handle MiniKit verification in World App
   const handleMiniKitVerification = async () => {
     if (!MiniKit || !MiniKit.isInstalled()) {
@@ -160,10 +183,13 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
 
     try {
       setIsVerifying(true);
+      
+      // Ensure we have a valid action ID
+      const validActionId = await ensureActionId();
 
       // Prepare verification payload based on verify.md
       const verifyPayload: VerifyCommandInput = {
-        action: actionId || `campaign-${campaignId}`,
+        action: validActionId,
         signal: signal || `campaign-verification-${campaignId}-${userRole}`,
         verification_level: VerificationLevel.Orb,
       };
