@@ -74,7 +74,7 @@ export const DonationStats = ({ data, className = "" }: DonationStatsProps) => {
         <StatCard
           icon={WarningTriangle}
           label="Active Disasters"
-          value={data.totalDonations.amount}
+          value={data.activeDonations}
         />
 
         {/* Active Campaigns */}

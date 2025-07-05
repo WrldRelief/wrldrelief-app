@@ -1,5 +1,8 @@
 "use client";
 
+import { MOCK_CAMPAIGNS } from "@/entities/campaign";
+import { MOCK_DISASTER_LOCATIONS } from "@/entities/disaster";
+
 /**
  * @interface DonationData
  * @description Donation statistics data structure
@@ -9,6 +12,7 @@ export interface DonationData {
     amount: number;
     currency: string;
   };
+  activeDonations: number;
   activeCampaigns: number;
 }
 
@@ -27,10 +31,11 @@ export const formatDonationAmount = (amount: number): string => {
 export const getDefaultDonationData = (): DonationData => {
   return {
     totalDonations: {
-      amount: 125000,
+      amount: 18940,
       currency: "USDC",
     },
-    activeCampaigns: 12,
+    activeDonations: MOCK_DISASTER_LOCATIONS.length,
+    activeCampaigns: MOCK_CAMPAIGNS.length,
   };
 };
 
