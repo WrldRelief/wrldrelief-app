@@ -223,7 +223,6 @@ export const verifyProof = async (
  * @param campaignId - 캠페인 ID
  * @returns 인증 여부
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const checkUserVerification = async (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _userId: string,

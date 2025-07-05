@@ -5,7 +5,7 @@ import { DisasterLocation } from "@/entities/disaster";
 import { CampaignData } from "@/entities/campaign";
 import { UserInfoExtended } from "@/entities/user/types";
 import { MOCK_DISASTER_LOCATIONS as MOCK_DISASTERS } from "@/entities/disaster/mockData";
-import { MOCK_CAMPAIGNS } from "@/entities/campaign/mockData";
+// MOCK_CAMPAIGNS는 제거되고 실제 온체인 데이터로 대체되었습니다.
 
 // Define missing types
 interface Donation {
@@ -111,7 +111,7 @@ export const useStore = create<StoreState>()(
       // 초기 상태
       users: [],
       disasters: [...MOCK_DISASTERS],
-      campaigns: [...MOCK_CAMPAIGNS],
+      campaigns: [], // 온체인 데이터로 대체됨
       donations: [],
       fundReceipts: [],
       aidDistributions: [],
@@ -240,7 +240,7 @@ export const useStore = create<StoreState>()(
         set({
           users: [],
           disasters: [...MOCK_DISASTERS],
-          campaigns: [...MOCK_CAMPAIGNS],
+          campaigns: [], // 온체인 데이터로 대체됨
           donations: [],
           fundReceipts: [],
           aidDistributions: [],

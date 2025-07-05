@@ -1,42 +1,10 @@
 // src/entities/sbt/mockData.ts
-import { SBTData, SBTType } from "./types";
+// 이 파일은 목업 데이터를 사용하지 않고 온체인 데이터만 사용합니다.
 
-/**
- * 온체인 데이터 구조와 일치하는 SBT 목업 데이터
- * WrldReliefSBT.sol의 SBTData 구조체와 정확히 일치하는 형태
- */
-export const MOCK_ONCHAIN_SBTS: SBTData[] = [
-  {
-    tokenId: 1,
-    holder: "0x1234567890123456789012345678901234567890", // 이더리움 주소 형식
-    sbtType: SBTType.DONOR,
-    campaignId: 0,
-    disasterId: "la-wildfire-001",
-    amount: 1000000000, // wei 단위 (1 ETH)
-    supportItem: "",
-    issuedAt: 1717027200, // 2024-06-01 (Unix timestamp)
-    metadataURI: "ipfs://QmXyZ123456789abcdef/1"
-  },
-  {
-    tokenId: 2,
-    holder: "0x2345678901234567890123456789012345678901", // 이더리움 주소 형식
-    sbtType: SBTType.RECIPIENT,
-    campaignId: 0,
-    disasterId: "la-wildfire-001",
-    amount: 500000000, // wei 단위 (0.5 ETH)
-    supportItem: "Food Packages",
-    issuedAt: 1717113600, // 2024-06-02 (Unix timestamp)
-    metadataURI: "ipfs://QmXyZ123456789abcdef/2"
-  },
-  {
-    tokenId: 3,
-    holder: "0x3456789012345678901234567890123456789012", // 이더리움 주소 형식
-    sbtType: SBTType.DONOR,
-    campaignId: 1,
-    disasterId: "israel-iran-war-001",
-    amount: 2000000000, // wei 단위 (2 ETH)
-    supportItem: "",
-    issuedAt: 1717200000, // 2024-06-03 (Unix timestamp)
-    metadataURI: "ipfs://QmXyZ123456789abcdef/3"
-  }
-];
+import { SBTData } from "./types";
+
+// 목업 데이터는 제거하고 온체인 데이터만 사용합니다.
+// 하지만 기존 코드와의 호환성을 위해 빈 배열로 유지합니다.
+export const MOCK_ONCHAIN_SBTS: SBTData[] = [];
+
+// 실제 SBT 데이터는 contracts/hooks.ts에서 가져와야 합니다.

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MOCK_CAMPAIGNS } from "@/entities/campaign";
+import { useCampaignData } from "@/entities/campaign/mockData";
 import { CampaignData, CampaignStatus } from "@/entities/campaign/types";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -10,11 +10,12 @@ import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 import DonationForm from "../DonationForm";
 
 // Extended campaign data with additional properties for UI
-interface ExtendedCampaignData extends CampaignData {
+interface ExtendedCampaignData extends Omit<CampaignData, 'updatedAt'> {
   resourceNeeds?: Record<string, string | number>;
   currentFunding?: number;
   targetFunding?: number;
   currency?: string;
+  updatedAt?: number; // 온체인 데이터에서는 없을 수 있으므로 옵셔널로 변경
 }
 
 interface CampaignDetailProps {
@@ -43,8 +44,9 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
   const router = useRouter();
   const { userRole } = useUserRole();
 
-  // Find the campaign by ID and extend with UI-specific properties
-  const baseCampaign = MOCK_CAMPAIGNS.find((c) => c.id === campaignId);
+  // 온체인 데이터를 사용하여 캠페인 정보 가져오기
+  const { campaigns } = useCampaignData();
+  const baseCampaign = campaigns.find((c) => c.id === campaignId);
 
   // Create extended campaign with UI-specific properties
   const campaign: ExtendedCampaignData | undefined = baseCampaign
