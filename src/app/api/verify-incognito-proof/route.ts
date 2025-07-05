@@ -19,7 +19,7 @@ interface MiniKitPayload {
 
 /**
  * API route to verify Worldcoin Incognito Actions proofs
- * 
+ *
  * @param req - The incoming request containing the proof and action
  * @returns NextResponse with verification result
  */
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     // Handle both IDKit and MiniKit payload formats
     const body = await req.json();
     let proofData, actionId;
-    
+
     // Check if this is a MiniKit payload format
     if (body.payload) {
       const { payload, action } = body;
@@ -42,22 +42,27 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify the proof with Worldcoin's API using fetch
-    const response = await fetch("https://developer.worldcoin.org/api/v1/verify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        proof: proofData,
-        action: actionId,
-        app_id: process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID || "app_staging_d4f9c8c1c1f0c0a0c0a0c0a0c0a0c0a0",
-      }),
-    });
-    
+    const response = await fetch(
+      "https://developer.worldcoin.org/api/v1/verify",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          proof: proofData,
+          action: actionId,
+          app_id:
+            process.env.NEXT_PUBLIC_APP_ID ||
+            "app_staging_d4f9c8c1c1f0c0a0c0a0c0a0c0a0c0a0",
+        }),
+      }
+    );
+
     if (!response.ok) {
       throw new Error(`Verification failed with status: ${response.status}`);
     }
-    
+
     const verifyRes: VerificationResult = await response.json();
 
     // Return the verification result

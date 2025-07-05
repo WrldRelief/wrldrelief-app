@@ -66,15 +66,12 @@ const Profile = () => {
 
   return (
     <>
-      {/* Profile header */}
       <Page.Header>
         <TopBar title="Profile" />
       </Page.Header>
-      {/* Role selection section */}
       <Page.Main>
         <h2 className="text-base font-medium text-black mb-4">Your Role</h2>
 
-        {/* Role selection */}
         <div className="space-y-2">
           {roleOptions.map((option) => (
             <div

@@ -1,8 +1,8 @@
-export type DonationStep = 'amount' | 'confirm' | 'processing' | 'success';
+export type DonationStep = "amount" | "confirm" | "processing" | "success";
 
-export type PaymentMethod = 'standard' | 'worldapp';
+export type PaymentMethod = "standard" | "worldapp";
 
-export type TokenType = 'USDC' | 'WLD';
+export type TokenType = "USDC" | "WLD";
 
 export interface DonationState {
   campaignId: number;
@@ -14,6 +14,7 @@ export interface DonationState {
   paymentMethod: PaymentMethod;
   selectedToken: TokenType;
   paymentReference?: string;
+  error?: string;
 }
 
 export interface DonationParams {
