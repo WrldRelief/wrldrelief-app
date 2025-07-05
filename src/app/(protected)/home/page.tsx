@@ -26,7 +26,7 @@ export default function Home() {
 
   return (
     <>
-      <Page.Header className="p-0">
+      <Page.Header>
         <TopBar
           title="World Relief"
           endAdornment={

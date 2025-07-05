@@ -16,7 +16,7 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({
   onBack,
 }) => {
   const [activeTab, setActiveTab] = useState<
-    "needed-items" | "active-campaigns" | "completed-campaigns"
+    "active-campaigns" | "completed-campaigns"
   >("active-campaigns");
 
   // Filter campaigns by the selected disaster region
@@ -100,18 +100,6 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({
         <nav className="flex">
           <button
             className={`px-4 py-3 text-sm font-medium ${
-              activeTab === "needed-items"
-                ? "border-b-2 border-blue-600 text-blue-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("needed-items")}
-            aria-label="Show needed items"
-            tabIndex={0}
-          >
-            Needed Items
-          </button>
-          <button
-            className={`px-4 py-3 text-sm font-medium ${
               activeTab === "active-campaigns"
                 ? "border-b-2 border-blue-600 text-blue-600"
                 : "text-gray-500 hover:text-gray-700"
@@ -139,16 +127,6 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({
 
       {/* Tab content */}
       <div className="p-4">
-        {/* Needed Items Tab Content */}
-        {activeTab === "needed-items" && (
-          <div>
-            <h2 className="text-lg font-semibold mb-4">
-              AI Predicted Resource Needs
-            </h2>
-            {/* <ResourceNeeds resourceNeeds={region.predictedNeeds || {}} /> */}
-          </div>
-        )}
-
         {/* Active Campaigns Tab Content */}
         {activeTab === "active-campaigns" && (
           <div>
