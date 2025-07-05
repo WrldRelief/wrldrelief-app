@@ -17,6 +17,10 @@ interface ExtendedCampaignData
   currency?: string;
   canEdit: boolean;
   totalDonations: number;
+  isRegistered?: boolean; // Added property for recipient registration status
+  registrationStatus?: "pending" | "approved" | "rejected"; // Status of the registration process
+  worldcoinVerified?: boolean; // Whether the user has verified with Worldcoin
+  location?: string; // Location of the campaign for distribution details
 }
 
 interface CampaignDetailProps {
@@ -43,21 +47,28 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
     | ExtendedCampaignData
     | undefined;
 
-  // Add UI-specific properties for the campaign
-  const enhancedCampaign: ExtendedCampaignData | undefined = campaign
-    ? {
-        ...campaign,
-        resourceNeeds: {
-          Water: "1000 liters",
-          Food: "500 kg",
-          Medicine: "200 kits",
-          Shelter: "50 units",
-        },
-        currentFunding: 3500,
-        targetFunding: 10000,
-        currency: "USDC",
-      }
-    : undefined;
+  // Add UI-specific properties for the campaign and store in state
+  const [enhancedCampaign, setEnhancedCampaign] = useState<
+    ExtendedCampaignData | undefined
+  >(() => {
+    return campaign
+      ? {
+          ...campaign,
+          resourceNeeds: {
+            Water: "1000 liters",
+            Food: "500 kg",
+            Medicine: "200 kits",
+            Shelter: "50 units",
+          },
+          currentFunding: 3500,
+          targetFunding: 10000,
+          currency: "USDC",
+          isRegistered: false,
+          registrationStatus: undefined,
+          worldcoinVerified: false,
+        }
+      : undefined;
+  });
 
   if (!enhancedCampaign) {
     return (
@@ -344,16 +355,197 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
         </div>
       ) : userRole === "recipient" ? (
         <div className="p-6 border-b">
-          <h2 className="text-lg font-semibold mb-4">Aid Status</h2>
-          <div className="bg-blue-50 p-4 rounded-lg mb-4">
-            <p className="font-medium text-blue-800 mb-1">
-              Your aid request is being processed
-            </p>
-            <p className="text-sm text-blue-600">
-              You will be notified when resources are available for
-              distribution.
-            </p>
-          </div>
+          <h2 className="text-lg font-semibold mb-4">
+            Aid Registration & Verification
+          </h2>
+
+          {/* Step 1: Register as affected person */}
+          {!enhancedCampaign.isRegistered && (
+            <div className="bg-white border rounded-lg p-4 mb-4">
+              <h3 className="font-medium text-gray-800 mb-2">
+                Step 1: Register as Affected Person
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Register yourself as affected by this disaster to receive aid
+                supplies. Your information will be securely stored and verified.
+              </p>
+              <Button
+                onClick={() => {
+                  // Simulate registration
+                  setEnhancedCampaign((prev) => ({
+                    ...prev,
+                    isRegistered: true,
+                    registrationStatus: "pending",
+                  }));
+                }}
+                className="w-full"
+                size="lg"
+              >
+                Register for Aid
+              </Button>
+            </div>
+          )}
+
+          {/* Step 2: Verification status */}
+          {enhancedCampaign.isRegistered &&
+            enhancedCampaign.registrationStatus === "pending" && (
+              <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                <h3 className="font-medium text-blue-800 mb-2">
+                  Step 2: Verification Pending
+                </h3>
+                <p className="text-sm text-blue-600 mb-3">
+                  Your registration has been received. The organization will
+                  verify your eligibility.
+                </p>
+                <div className="flex items-center text-sm text-blue-700">
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>Verification usually takes 24-48 hours</span>
+                </div>
+
+                {/* For demo purposes, add a button to simulate approval */}
+                <Button
+                  variant="tertiary"
+                  onClick={() => {
+                    setEnhancedCampaign((prev) => ({
+                      ...prev,
+                      registrationStatus: "approved",
+                    }));
+                  }}
+                  className="mt-4 text-xs"
+                  size="sm"
+                >
+                  (Demo: Simulate Approval)
+                </Button>
+              </div>
+            )}
+
+          {/* Step 3: Worldcoin verification for approved registrations */}
+          {enhancedCampaign.isRegistered &&
+            enhancedCampaign.registrationStatus === "approved" &&
+            !enhancedCampaign.worldcoinVerified && (
+              <div className="bg-green-50 p-4 rounded-lg mb-4">
+                <h3 className="font-medium text-green-800 mb-2">
+                  Step 3: Identity Verification Required
+                </h3>
+                <p className="text-sm text-green-600 mb-4">
+                  Your aid request has been approved! To prevent duplicate
+                  claims and ensure fair distribution, please verify your
+                  identity with Worldcoin before collecting supplies.
+                </p>
+                <Button
+                  onClick={() => {
+                    // Simulate Worldcoin verification
+                    setEnhancedCampaign((prev) => ({
+                      ...prev,
+                      worldcoinVerified: true,
+                    }));
+                  }}
+                  className="w-full"
+                  size="lg"
+                >
+                  <div className="flex items-center justify-center">
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      />
+                      <circle cx="12" cy="12" r="5" fill="currentColor" />
+                    </svg>
+                    Verify with Worldcoin
+                  </div>
+                </Button>
+              </div>
+            )}
+
+          {/* Step 4: Claim aid with QR code */}
+          {enhancedCampaign.isRegistered &&
+            enhancedCampaign.registrationStatus === "approved" &&
+            enhancedCampaign.worldcoinVerified && (
+              <div className="bg-green-50 p-4 rounded-lg mb-4">
+                <div className="flex items-center mb-2">
+                  <svg
+                    className="w-5 h-5 text-green-600 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <h3 className="font-medium text-green-800">
+                    Identity Verified!
+                  </h3>
+                </div>
+
+                <p className="text-sm text-green-600 mb-4">
+                  You are now eligible to receive aid supplies. Show the QR code
+                  below at the distribution center.
+                </p>
+
+                <div className="bg-white p-4 rounded-lg mb-4 flex flex-col items-center">
+                  {/* Mock QR code */}
+                  <div className="w-48 h-48 bg-gray-100 border flex items-center justify-center mb-2">
+                    <svg
+                      className="w-40 h-40"
+                      viewBox="0 0 100 100"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <rect x="10" y="10" width="30" height="30" fill="black" />
+                      <rect x="60" y="10" width="30" height="30" fill="black" />
+                      <rect x="10" y="60" width="30" height="30" fill="black" />
+                      <rect x="50" y="50" width="10" height="10" fill="black" />
+                      <rect x="70" y="50" width="10" height="10" fill="black" />
+                      <rect x="50" y="70" width="10" height="10" fill="black" />
+                      <rect x="70" y="70" width="10" height="10" fill="black" />
+                      <rect x="90" y="70" width="10" height="10" fill="black" />
+                      <rect x="70" y="90" width="10" height="10" fill="black" />
+                    </svg>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Aid Claim Code: WC-
+                    {Math.floor(Math.random() * 10000)
+                      .toString()
+                      .padStart(4, "0")}
+                  </p>
+                </div>
+
+                <div className="bg-white p-3 rounded-lg border border-green-200">
+                  <h4 className="font-medium text-gray-800 text-sm mb-1">
+                    Distribution Details:
+                  </h4>
+                  <p className="text-xs text-gray-600 mb-1">
+                    Location: {campaign.location} Relief Center
+                  </p>
+                  <p className="text-xs text-gray-600 mb-1">
+                    Available: Daily, 9:00 AM - 5:00 PM
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    Items: Food, Water, Medical Supplies, Shelter Kits
+                  </p>
+                </div>
+              </div>
+            )}
         </div>
       ) : (
         <>
