@@ -302,8 +302,8 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
     );
   } else {
     // Web environment - use IDKit
-    // Use provided action ID or fallback to test ID
-    const effectiveActionId = actionId || "wld_staging_1234567890";
+    // Use provided action ID or use the claim-aid identifier that user created
+    const effectiveActionId = actionId || "claim-aid";
 
     // Format app_id to match required format `app_${string}`
     const appId = (process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID ||

@@ -112,8 +112,8 @@ export async function GET(req: NextRequest) {
     // 데이터베이스에서 캠페인에 연결된 액션 조회 (실제 구현 필요)
     // const action = await db.actions.findFirst({ where: { campaignId } });
 
-    // 캠페인 ID에 대해 일관된 액션 ID 생성 (타임스탬프 제거)
-    const actionId = `campaign_${campaignId}`;
+    // 사용자가 이미 생성한 Incognito Action의 identifier 사용
+    const actionId = "claim-aid";
     
     // Worldcoin API를 사용하여 액션 조회 또는 생성
     let action;
