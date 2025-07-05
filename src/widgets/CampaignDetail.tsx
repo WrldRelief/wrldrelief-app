@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button, Progress } from "@worldcoin/mini-apps-ui-kit-react";
 import { useUserRole } from "@/context/UserRoleContext";
+import WorldcoinVerification from "@/shared/components/WorldcoinVerification";
 
 // Extended campaign data with additional properties for UI
 interface ExtendedCampaignData
@@ -443,34 +444,21 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
                   claims and ensure fair distribution, please verify your
                   identity with Worldcoin before collecting supplies.
                 </p>
-                <Button
-                  onClick={() => {
-                    // Simulate Worldcoin verification
+                {/* Worldcoin Incognito Actions Verification */}
+                <WorldcoinVerification
+                  campaignId={campaignId}
+                  onSuccess={() => {
                     setEnhancedCampaign((prev) => ({
                       ...prev,
                       worldcoinVerified: true,
                     }));
                   }}
+                  onError={(error) => {
+                    console.error("Worldcoin verification failed:", error);
+                    // Optionally show an error message to the user
+                  }}
                   className="w-full"
-                  size="lg"
-                >
-                  <div className="flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 mr-2"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      />
-                      <circle cx="12" cy="12" r="5" fill="currentColor" />
-                    </svg>
-                    Verify with Worldcoin
-                  </div>
-                </Button>
+                />
               </div>
             )}
 
