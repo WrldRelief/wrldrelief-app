@@ -376,10 +376,20 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
                 <WorldcoinVerification
                   campaignId={campaignId}
                   onSuccess={() => {
+                    console.log("Verification successful! Moving to Step 3...");
+                    // 검증 성공 시 worldcoinVerified를 true로 설정하여 Step 3에서 Step 4로 넘어가도록 함
                     setEnhancedCampaign((prev) => ({
                       ...prev,
                       worldcoinVerified: true,
                     }));
+                    
+                    // Step 3로 명시적으로 스크롤
+                    setTimeout(() => {
+                      const step4Element = document.getElementById("step-4-claim-aid");
+                      if (step4Element) {
+                        step4Element.scrollIntoView({ behavior: "smooth" });
+                      }
+                    }, 500);
                   }}
                   onError={(error) => {
                     console.error("Worldcoin verification failed:", error);
@@ -394,7 +404,7 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
           {enhancedCampaign.isRegistered &&
             enhancedCampaign.registrationStatus === "approved" &&
             enhancedCampaign.worldcoinVerified && (
-              <div className="bg-green-50 p-4 rounded-lg mb-4">
+              <div id="step-4-claim-aid" className="bg-green-50 p-4 rounded-lg mb-4">
                 <div className="flex items-center mb-2">
                   <svg
                     className="w-5 h-5 text-green-600 mr-2"
