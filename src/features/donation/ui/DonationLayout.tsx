@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
 import { Button, Progress } from "@worldcoin/mini-apps-ui-kit-react";
 
 interface DonationLayoutProps {
@@ -21,15 +20,13 @@ export const DonationLayout: React.FC<DonationLayoutProps> = ({
   onBack,
   campaignName,
 }) => {
-  const router = useRouter();
-
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="w-full max-w-md mx-auto">
         {/* Header with back button */}
         <div className="flex items-center mb-6 gap-2">
           <Button
-            onClick={() => router.back()}
+            onClick={() => onBack?.()}
             aria-label="Go back"
             size="icon"
             variant="secondary"

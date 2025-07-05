@@ -20,7 +20,7 @@ const DisasterDetail = () => {
     ) || MOCK_DISASTER_LOCATIONS[0];
 
   // Get disaster name for the title
-  const disasterName = disaster ? disaster.name : "Disaster Details";
+  // const disasterName = disaster ? disaster.name : "Disaster Details";
 
   return (
     <>

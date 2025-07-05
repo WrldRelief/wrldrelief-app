@@ -17,10 +17,10 @@ interface DisasterFilterProps {
 export const DisasterFilter: React.FC<DisasterFilterProps> = ({
   typeFilter,
   urgencyFilter,
-  searchQuery,
+  // searchQuery,
   onTypeFilterChange,
   onUrgencyFilterChange,
-  onSearchQueryChange,
+  // onSearchQueryChange,
 }) => {
   return (
     <div>
@@ -84,7 +84,6 @@ export const DisasterFilter: React.FC<DisasterFilterProps> = ({
             onClick={() => {
               onTypeFilterChange("");
               onUrgencyFilterChange("");
-              onSearchQueryChange("");
             }}
             variant="secondary"
             size="sm"

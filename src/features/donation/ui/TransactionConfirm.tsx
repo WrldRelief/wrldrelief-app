@@ -7,7 +7,9 @@ import { MOCK_CAMPAIGNS } from "@/entities/campaign";
 
 export const TransactionConfirm: React.FC = () => {
   const { donationState, goToStep } = useDonation();
-  const campaign = MOCK_CAMPAIGNS.find((c) => c.id === donationState.campaignId);
+  const campaign = MOCK_CAMPAIGNS.find(
+    (c) => c.id === donationState.campaignId
+  );
 
   if (!campaign) {
     return (
@@ -17,7 +19,8 @@ export const TransactionConfirm: React.FC = () => {
             Campaign Not Found
           </h2>
           <p className="text-gray-600 mb-6 text-center">
-            The campaign you're trying to donate to doesn't exist or has been removed.
+            The campaign you&apos;re trying to donate to doesn&apos;t exist or
+            has been removed.
           </p>
           <Button
             onClick={() => goToStep("amount")}
@@ -45,14 +48,18 @@ export const TransactionConfirm: React.FC = () => {
   return (
     <div className="w-full max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
       <div className="p-4 bg-blue-50 border-b">
-        <h2 className="text-xl font-semibold text-center">Confirm Transaction</h2>
+        <h2 className="text-xl font-semibold text-center">
+          Confirm Transaction
+        </h2>
       </div>
 
       <div className="p-6">
         <div className="mb-6">
           <div className="mb-4">
             <span className="block text-sm text-gray-600 mb-1">Amount:</span>
-            <span className="block text-lg font-semibold">{donationState.amount} USDC</span>
+            <span className="block text-lg font-semibold">
+              {donationState.amount} USDC
+            </span>
           </div>
 
           <div className="mb-4">
@@ -67,7 +74,9 @@ export const TransactionConfirm: React.FC = () => {
             <span className="block text-sm text-gray-600 mb-1">
               Your Wallet:
             </span>
-            <span className="block text-sm font-mono">{donationState.walletAddress}</span>
+            <span className="block text-sm font-mono">
+              {donationState.walletAddress}
+            </span>
           </div>
 
           <div className="mb-4">
@@ -87,7 +96,7 @@ export const TransactionConfirm: React.FC = () => {
           >
             Confirm
           </Button>
-          
+
           <Button
             variant="tertiary"
             onClick={handleBack}

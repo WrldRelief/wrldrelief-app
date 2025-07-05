@@ -7,18 +7,22 @@ import { useRouter } from "next/navigation";
 import { MOCK_CAMPAIGNS } from "@/entities/campaign";
 
 const DonatePage = () => {
-  const { donationState, goToStep } = useDonation();
+  const { donationState } = useDonation();
   const router = useRouter();
-  const campaign = MOCK_CAMPAIGNS.find((c) => c.id === donationState.campaignId);
-  
+  const campaign = MOCK_CAMPAIGNS.find(
+    (c) => c.id === donationState.campaignId
+  );
+
   if (!campaign) return null;
-  
+
   const handleBack = () => {
-    router.push(`/explore/${donationState.disasterId}/${donationState.campaignId}`);
+    router.push(
+      `/explore/${donationState.disasterId}/${donationState.campaignId}`
+    );
   };
 
   return (
-    <DonationLayout 
+    <DonationLayout
       title="Select Amount"
       step={1}
       totalSteps={3}

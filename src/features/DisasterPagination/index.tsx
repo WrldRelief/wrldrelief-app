@@ -19,7 +19,7 @@ export interface UsePaginationResult {
   PaginationControls: React.FC;
 }
 
-export const usePagination = <T,>({
+export const usePagination = ({
   totalItems,
   itemsPerPage = 5,
   initialPage = 1,
@@ -61,13 +61,15 @@ export const usePagination = <T,>({
         >
           Previous
         </Button>
-        
+
         <span className="text-sm font-medium">
           {currentPage} / {totalPages}
         </span>
-        
+
         <Button
-          onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+          onClick={() =>
+            handlePageChange(Math.min(totalPages, currentPage + 1))
+          }
           disabled={currentPage === totalPages}
           aria-label="Next page"
           variant="secondary"

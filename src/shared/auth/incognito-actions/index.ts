@@ -50,7 +50,7 @@ export const createIncognitoActionConfig = (
  * @param campaignId - The campaign ID associated with this verification
  * @returns Promise resolving to verification result
  */
-export const verifyProof = async (proof: any, campaignId: number | string) => {
+export const verifyProof = async (proof: ISuccessResult, campaignId: number | string) => {
   try {
     // Call your backend API to verify the proof
     const response = await fetch("/api/verify-incognito-proof", {

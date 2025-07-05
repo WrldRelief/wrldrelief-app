@@ -26,22 +26,13 @@ interface ExtendedCampaignData
 
 interface CampaignDetailProps {
   campaignId: number;
-  onBack?: () => void;
 }
 
 export const CampaignDetail: React.FC<CampaignDetailProps> = ({
   campaignId,
-  onBack,
 }) => {
   const router = useRouter();
   const { userRole } = useUserRole();
-  const [donationAmount, setDonationAmount] = useState<number>(10);
-  const [customAmount, setCustomAmount] = useState<string>("");
-  const [donationStep, setDonationStep] = useState<
-    "amount" | "confirm" | "processing" | "success"
-  >("amount");
-  const [walletConnected, setWalletConnected] = useState<boolean>(false);
-  const [walletAddress, setWalletAddress] = useState<string>("");
 
   // Find the campaign by ID
   const campaign = MOCK_CAMPAIGNS.find((c) => c.id === campaignId) as
@@ -119,69 +110,6 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
       )
     );
   };
-
-  // Handle donation amount selection
-  const handleDonationAmountSelect = (amount: number) => {
-    setDonationAmount(amount);
-    setCustomAmount("");
-  };
-
-  // Handle custom amount input
-  const handleCustomAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Only allow numbers and decimals
-    if (/^\d*\.?\d*$/.test(value)) {
-      setCustomAmount(value);
-      if (value) {
-        setDonationAmount(parseFloat(value));
-      }
-    }
-  };
-
-  // Handle wallet connection
-  const connectWallet = () => {
-    // Simulate wallet connection
-    setWalletConnected(true);
-    // Generate a mock wallet address
-    const mockAddress =
-      "0x" +
-      Math.random().toString(16).substring(2, 14) +
-      "..." +
-      Math.random().toString(16).substring(2, 6);
-    setWalletAddress(mockAddress);
-    setDonationStep("confirm");
-  };
-
-  // Handle donation submission
-  const handleDonate = () => {
-    if (!walletConnected) {
-      connectWallet();
-      return;
-    }
-
-    // If already connected, move to processing step
-    setDonationStep("processing");
-
-    // Simulate processing time
-    setTimeout(() => {
-      setDonationStep("success");
-    }, 2000);
-  };
-
-  // Reset donation flow
-  const resetDonation = () => {
-    setDonationStep("amount");
-    setDonationAmount(10);
-    setCustomAmount("");
-  };
-
-  // Format wallet address for display
-  const formatWalletAddress = (address: string) => {
-    if (!address) return "";
-    return address;
-  };
-
-  console.log("campaign", campaign);
 
   return (
     <div className="flex flex-col w-full max-w-2xl mx-auto bg-white rounded-lg shadow-md">

@@ -4,7 +4,6 @@ import { Page } from "@/features/PageLayout";
 import { CampaignDetail } from "@/widgets/CampaignDetail";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 import { useParams, useRouter } from "next/navigation";
-import { MOCK_CAMPAIGNS } from "@/entities/campaign";
 import { UserRoleProvider } from "@/context/UserRoleContext";
 import { useEffect, useState } from "react";
 
@@ -18,10 +17,10 @@ const CampaignDetailPage = () => {
   const disasterId = params.desasterId as string;
 
   // Find the campaign by ID
-  const campaign = MOCK_CAMPAIGNS.find((c) => c.id === campaignId);
+  // const campaign = MOCK_CAMPAIGNS.find((c) => c.id === campaignId);
 
   // Get campaign name for the title
-  const campaignName = campaign ? campaign.name : "Campaign Details";
+  // const campaignName = campaign ? campaign.name : "Campaign Details";
 
   // Simulate loading state
   useEffect(() => {
@@ -64,7 +63,7 @@ const CampaignDetailPage = () => {
             </div>
           </div>
         ) : (
-          <CampaignDetail onBack={handleBack} campaignId={campaignId} />
+          <CampaignDetail campaignId={campaignId} />
         )}
       </Page.Main>
     </UserRoleProvider>

@@ -15,9 +15,9 @@ interface DisasterListProps {
 export const DisasterList: React.FC<DisasterListProps> = ({
   disasters,
   onDisasterSelect,
-  itemsPerPage = 5,
+  itemsPerPage = 8,
 }) => {
-  const { currentPage, currentPageItems, PaginationControls } = usePagination({
+  const { currentPageItems, PaginationControls } = usePagination({
     totalItems: disasters.length,
     itemsPerPage,
   });
