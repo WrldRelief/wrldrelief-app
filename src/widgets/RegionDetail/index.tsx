@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { DisasterLocation } from "@/entities/disaster/types";
+import { DisasterLocationExtended } from "@/entities/disaster/types";
 import Image from "next/image";
 import { useUserRole } from "@/context/UserRoleContext";
 import { useRouter } from "next/navigation";
 import { Button, Tabs, TabItem } from "@worldcoin/mini-apps-ui-kit-react";
 import { Activity, CheckCircle, Package } from "iconoir-react";
-import { MOCK_CAMPAIGNS } from "@/entities/campaign";
+import { MOCK_CAMPAIGNS, CampaignStatus } from "@/entities/campaign";
 import { getUrgencyBgClass } from "@/features/DisasterDisplay";
 import dynamic from "next/dynamic";
 
@@ -20,7 +20,7 @@ const Map = dynamic(() => import("@/features/Map").then((mod) => mod.Map), {
 });
 
 interface RegionDetailProps {
-  region: DisasterLocation;
+  region: DisasterLocationExtended;
 }
 
 export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
@@ -35,10 +35,10 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
     (campaign) => campaign.disasterId === region.id
   );
   const activeCampaigns = campaigns.filter(
-    (campaign) => campaign.status === "ACTIVE"
+    (campaign) => campaign.status === CampaignStatus.ACTIVE
   );
   const completedCampaigns = campaigns.filter(
-    (campaign) => campaign.status === "ENDED"
+    (campaign) => campaign.status === CampaignStatus.ENDED
   );
 
   // Organization-specific actions

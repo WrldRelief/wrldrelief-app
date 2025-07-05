@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import mapboxgl, { Map as MapboxMap } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { DisasterLocation } from "@/entities/disaster/types";
+import { DisasterLocationExtended } from "@/entities/disaster/types";
 
 // Mapbox access token
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
@@ -20,8 +20,8 @@ interface MapProps {
     minZoom?: number;
     maxZoom?: number;
   };
-  markers?: GeoJSON.Feature<GeoJSON.Point, DisasterLocation>[];
-  onMarkerClick?: (properties: DisasterLocation) => void;
+  markers?: GeoJSON.Feature<GeoJSON.Point, DisasterLocationExtended>[];
+  onMarkerClick?: (properties: DisasterLocationExtended) => void;
   spinGlobe?: boolean;
   trackUserLocation?: boolean;
 }
@@ -221,7 +221,9 @@ export const Map = ({
         if (onMarkerClick) {
           map.on("click", "disaster-circle-layer", (e) => {
             if (e.features && e.features[0]?.properties) {
-              onMarkerClick(e.features[0].properties as DisasterLocation);
+              onMarkerClick(
+                e.features[0].properties as DisasterLocationExtended
+              );
             }
           });
           map.on("mouseenter", "disaster-circle-layer", () => {

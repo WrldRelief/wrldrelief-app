@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { DisasterLocation } from "@/entities/disaster/types";
+import { DisasterLocation } from "@/entities/disaster";
 import Image from "next/image";
 // import { ResourceNeeds } from "@/features/ResourceNeeds";
 import { useUserRole } from "@/context/UserRoleContext";
