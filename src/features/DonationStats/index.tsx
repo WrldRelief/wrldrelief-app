@@ -12,6 +12,7 @@ export interface DonationData {
     amount: number;
     currency: string;
   };
+  totalDonationsCount: number;
   activeDonations: number;
   activeCampaigns: number;
 }
@@ -31,9 +32,10 @@ export const formatDonationAmount = (amount: number): string => {
 export const getDefaultDonationData = (): DonationData => {
   return {
     totalDonations: {
-      amount: 18940,
+      amount: 3500,
       currency: "USDC",
     },
+    totalDonationsCount: 4,
     activeDonations: MOCK_DISASTER_LOCATIONS.length,
     activeCampaigns: MOCK_CAMPAIGNS.length,
   };

@@ -67,7 +67,7 @@ export const DonationStats = ({ data, className = "" }: DonationStatsProps) => {
         <StatCard
           icon={User}
           label="Total Donors"
-          value={data.totalDonations.amount}
+          value={data.totalDonationsCount}
         />
 
         {/* Total Disasters */}
