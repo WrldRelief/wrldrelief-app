@@ -8,7 +8,21 @@ import { ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
 import dynamic from "next/dynamic";
 
 // Client-side only imports
-let MiniKit: any;
+// Define a proper type for MiniKit to avoid 'any'
+interface IMiniKit {
+  isInstalled: () => boolean;
+  commandsAsync: {
+    verify: (input: VerifyCommandInput) => Promise<{
+      finalPayload: {
+        status: string;
+        error?: string;
+        [key: string]: unknown;
+      };
+    }>;
+  };
+}
+
+let MiniKit: IMiniKit | undefined;
 
 // IDKit widget for client-side only rendering
 const DynamicIDKitWidget = dynamic(
@@ -228,7 +242,7 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          payload: finalPayload as ISuccessResult,
+          payload: finalPayload as unknown as ISuccessResult,
           action: verifyPayload.action,
           signal: verifyPayload.signal,
           campaignId,

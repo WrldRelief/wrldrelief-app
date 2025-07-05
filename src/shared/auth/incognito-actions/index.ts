@@ -186,7 +186,7 @@ export const verifyProof = async (
     try {
       const action = await getIncognitoAction(campaignId);
       actionId = action?.id || generateActionId(campaignId);
-    } catch (error) {
+    } catch (_) {
       // 액션 조회 실패 시 기본 ID 사용
       actionId = generateActionId(campaignId);
     }
@@ -223,8 +223,8 @@ export const verifyProof = async (
  * @returns 인증 여부
  */
 export const checkUserVerification = async (
-  userId: string,
-  campaignId: number | string
+  _userId: string,
+  _campaignId: number | string
 ): Promise<boolean> => {
   try {
     // 실제 구현에서는 백엔드 API를 호출하여 사용자 인증 상태 확인

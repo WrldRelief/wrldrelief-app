@@ -16,7 +16,7 @@ export const TransactionConfirm: React.FC = () => {
     processWorldAppPayment,
   } = useDonation();
   // World App만 결제 방법으로 사용
-  const [paymentTab, setPaymentTab] = useState<"worldapp">("worldapp");
+  const [paymentTab] = useState<"worldapp">("worldapp");
   const [selectedToken, setTokenSelection] = useState<TokenType>(
     donationState.selectedToken
   );

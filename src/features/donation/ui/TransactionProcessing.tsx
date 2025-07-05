@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Spinner } from "@worldcoin/mini-apps-ui-kit-react";
 import { useDonation } from "../model/DonationContext";
 
 export const TransactionProcessing: React.FC = () => {
-  const { donationState, setTransactionId, goToStep } = useDonation();
+  const { donationState } = useDonation();
 
   // 자동 타이머 제거 - 실제 결제 처리는 DonationContext의 processWorldAppPayment 함수에서 처리함
   // 이 화면은 단순히 결제 처리 중임을 표시하는 화면으로만 사용

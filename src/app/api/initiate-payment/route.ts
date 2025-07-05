@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TokenType } from '@/features/donation/model/types';
-import { pendingPayments, PaymentRequest } from '@/shared/store/payments';
+import { pendingPayments } from '@/shared/store/payments';
 
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
     // Generate a unique reference ID for this payment
     const reference = crypto.randomUUID().replace(/-/g, '');
