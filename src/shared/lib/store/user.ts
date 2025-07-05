@@ -1,8 +1,8 @@
 import { atom } from 'jotai';
-import { UserInfo, initialUserState } from '@/entities/user/types';
+import { UserInfoExtended, initialUserState } from '@/entities/user/types';
 
 // 사용자 정보를 저장하는 atom
-export const userAtom = atom<UserInfo>(initialUserState);
+export const userAtom = atom<UserInfoExtended>(initialUserState);
 
 // 파생된 atom들 - 필요한 경우 사용
 export const isAuthenticatedAtom = atom((get) => get(userAtom).isAuthenticated);
