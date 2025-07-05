@@ -15,9 +15,8 @@ export const TransactionConfirm: React.FC = () => {
     setSelectedToken,
     processWorldAppPayment,
   } = useDonation();
-  const [paymentTab, setPaymentTab] = useState<"standard" | "worldapp">(
-    donationState.paymentMethod
-  );
+  // World App만 결제 방법으로 사용
+  const [paymentTab, setPaymentTab] = useState<"worldapp">("worldapp");
   const [selectedToken, setTokenSelection] = useState<TokenType>(
     donationState.selectedToken
   );
@@ -72,24 +71,21 @@ export const TransactionConfirm: React.FC = () => {
 
   const handleConfirm = () => {
     // Update context with selected payment method and token
-    setPaymentMethod(paymentTab);
+    setPaymentMethod("worldapp");
     setSelectedToken(selectedToken);
 
-    if (paymentTab === "worldapp") {
-      // Process payment through World App
-      processWorldAppPayment();
-    } else {
-      // Standard payment flow
-      goToStep("processing");
-    }
+    // Process payment through World App
+    processWorldAppPayment();
   };
 
   const handleBack = () => {
     goToStep("amount");
   };
 
-  const handlePaymentMethodChange = (value: string) => {
-    setPaymentTab(value as "standard" | "worldapp");
+  // World App만 결제 방법으로 사용하미로 핸들러는 고정 값만 처리
+  const handlePaymentMethodChange = (value: "worldapp") => {
+    setPaymentTab(value);
+    setPaymentMethod(value);
   };
 
   const handleTokenChange = (token: TokenType) => {
@@ -132,45 +128,38 @@ export const TransactionConfirm: React.FC = () => {
           </div>
         </div>
 
-        {/* Payment Method Selection */}
+        {/* Payment Method - World App Only */}
         <div className="mb-6">
           <h3 className="text-sm font-medium text-gray-700 mb-3">
             Payment Method
           </h3>
-          <Tabs value={paymentTab} onValueChange={handlePaymentMethodChange}>
-            <TabItem value="standard" label="Standard" icon={<Wallet />} />
-            <TabItem
-              value="worldapp"
-              label="World App"
-              icon={
-                <div className="flex items-center justify-center w-5 h-5">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-              }
-              disabled={isWorldAppAvailable === false}
-            />
-          </Tabs>
+          <div className="flex items-center p-3 border rounded-lg bg-gray-50 border-black">
+            <div className="flex items-center justify-center w-5 h-5 mr-2">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <span className="font-medium">World App</span>
+          </div>
 
           {/* World App availability warning */}
           {paymentTab === "worldapp" && isWorldAppAvailable === false && (
@@ -246,26 +235,7 @@ export const TransactionConfirm: React.FC = () => {
           </div>
         )}
 
-        {/* Standard payment method details */}
-        {paymentTab === "standard" && (
-          <div>
-            <div className="mb-4">
-              <span className="block text-sm text-gray-600 mb-1">
-                Your Wallet:
-              </span>
-              <span className="block text-sm font-mono">
-                {donationState.walletAddress}
-              </span>
-            </div>
-
-            <div className="mb-4">
-              <span className="block text-sm text-gray-600 mb-1">
-                Estimated Gas Fee:
-              </span>
-              <span className="block text-sm">{estimatedGasFee} ETH</span>
-            </div>
-          </div>
-        )}
+        {/* Standard payment method details removed */}
 
         {/* World App payment method details */}
         {paymentTab === "worldapp" && (
