@@ -120,7 +120,12 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
         </h1>
         <div className="flex items-center mt-2 text-gray-600">
           <span className="text-sm">
-            By <span className="font-medium">{enhancedCampaign.organizer}</span>
+            By{" "}
+            <span className="font-medium" title={enhancedCampaign.organizer}>
+              {enhancedCampaign.organizer.length > 8
+                ? `${enhancedCampaign.organizer.substring(0, 8)}...`
+                : enhancedCampaign.organizer}
+            </span>
           </span>
           <span className="mx-2 text-gray-400">•</span>
           <span className="text-sm text-gray-500">
