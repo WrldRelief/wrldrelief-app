@@ -1,13 +1,7 @@
-import React from "react";
-import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
+import React, { useState } from "react";
+import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
 import { createIncognitoActionConfig, verifyProof } from "@/shared/auth/incognito-actions";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
-
-// Define the verification level enum to match IDKit's expectations
-enum VerificationLevel {
-  Orb = "orb",
-  Device = "device"
-}
 
 interface WorldcoinVerificationProps {
   campaignId: number | string;
@@ -18,17 +12,22 @@ interface WorldcoinVerificationProps {
 }
 
 /**
- * A component that renders the Worldcoin IDKit widget for Incognito Actions verification
+ * A component for Worldcoin Incognito Actions verification optimized for Mini Apps
  */
 const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
   campaignId,
   onSuccess,
   onError,
-  buttonText = "Verify with Worldcoin",
+  buttonText = "Verify Identity",
   className = "",
 }) => {
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  // Handle verification with the proof from IDKit
   const handleVerify = async (result: ISuccessResult) => {
     try {
+      setIsVerifying(true);
+      
       // Verify the proof with our backend
       await verifyProof(result, campaignId);
       
@@ -39,9 +38,11 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
       if (onError && error instanceof Error) {
         onError(error);
       }
+    } finally {
+      setIsVerifying(false);
     }
   };
-
+  
   // Create the IDKit configuration
   const idkitConfig = createIncognitoActionConfig(campaignId, () => {});
 
@@ -58,6 +59,7 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
           onClick={open}
           className={className}
           size="lg"
+          disabled={isVerifying}
         >
           <div className="flex items-center justify-center">
             <svg
@@ -73,7 +75,7 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
               />
               <circle cx="12" cy="12" r="5" fill="currentColor" />
             </svg>
-            {buttonText}
+            {isVerifying ? "Verifying..." : buttonText}
           </div>
         </Button>
       )}
