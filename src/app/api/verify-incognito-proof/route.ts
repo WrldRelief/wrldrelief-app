@@ -8,6 +8,15 @@ interface VerificationResult {
   signal?: string;
 }
 
+// Define the payload structure from MiniKit verify API
+interface MiniKitPayload {
+  status: string;
+  nullifier_hash?: string;
+  merkle_root?: string;
+  proof?: string;
+  verification_level?: string;
+}
+
 /**
  * API route to verify Worldcoin Incognito Actions proofs
  * 
@@ -16,7 +25,21 @@ interface VerificationResult {
  */
 export async function POST(req: NextRequest) {
   try {
-    const { proof, action } = await req.json();
+    // Handle both IDKit and MiniKit payload formats
+    const body = await req.json();
+    let proofData, actionId;
+    
+    // Check if this is a MiniKit payload format
+    if (body.payload) {
+      const { payload, action } = body;
+      proofData = payload;
+      actionId = action;
+    } else {
+      // Legacy IDKit format
+      const { proof, action } = body;
+      proofData = proof;
+      actionId = action;
+    }
 
     // Verify the proof with Worldcoin's API using fetch
     const response = await fetch("https://developer.worldcoin.org/api/v1/verify", {
@@ -25,11 +48,9 @@ export async function POST(req: NextRequest) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        proof,
-        action,
+        proof: proofData,
+        action: actionId,
         app_id: process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID || "app_staging_d4f9c8c1c1f0c0a0c0a0c0a0c0a0c0a0",
-        // Optional: Include nullifier to prevent duplicate verifications
-        // nullifier_nonce: proof.nullifier_nonce,
       }),
     });
     

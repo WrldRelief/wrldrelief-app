@@ -51,6 +51,7 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
           alt={`Disaster situation in ${region.name}`}
           fill
           className="object-cover rounded-lg"
+          priority
         />
       </div>
 
