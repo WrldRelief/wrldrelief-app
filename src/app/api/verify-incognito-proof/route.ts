@@ -8,14 +8,14 @@ interface VerificationResult {
   signal?: string;
 }
 
-// Define the payload structure from MiniKit verify API
-interface MiniKitPayload {
-  status: string;
-  nullifier_hash?: string;
-  merkle_root?: string;
-  proof?: string;
-  verification_level?: string;
-}
+// // Define the payload structure from MiniKit verify API
+// interface MiniKitPayload {
+//   status: string;
+//   nullifier_hash?: string;
+//   merkle_root?: string;
+//   proof?: string;
+//   verification_level?: string;
+// }
 
 /**
  * API route to verify Worldcoin Incognito Actions proofs

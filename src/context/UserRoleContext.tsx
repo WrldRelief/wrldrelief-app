@@ -12,7 +12,7 @@ interface UserRoleContextType {
 // Default context value with error handling for setUserRole
 export const UserRoleContext = createContext<UserRoleContextType>({
   userRole: "donor", // 기본값
-  setUserRole: (role: UserRole) => {
+  setUserRole: () => {
     throw new Error(
       "UserRoleContext not initialized - role should be updated when calling setUserRole"
     );

@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TokenType } from '@/features/donation/model/types';
+import { pendingPayments, PaymentRequest } from '@/shared/store/payments';
 
-interface PaymentRequest {
-  campaignId: number;
-  disasterId: string;
-  amount: number;
-  token: TokenType;
-}
-
-// In a real app, we would store this in a database
-export const pendingPayments = new Map<string, PaymentRequest>();
 
 export async function POST(req: NextRequest) {
   try {

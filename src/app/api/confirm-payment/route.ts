@@ -11,8 +11,7 @@ interface PaymentConfirmationRequest {
 }
 
 // In-memory store for pending payments (replace with database in production)
-// This is imported from initiate-payment to maintain consistency
-import { pendingPayments } from "../initiate-payment/route";
+import { pendingPayments } from "@/shared/store/payments";
 
 export async function POST(req: NextRequest) {
   try {
