@@ -140,7 +140,11 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
       
       // Call success callback and move to next step
       setIsVerifying(false);
-      onSuccess();
+      // 검증 성공 시 콜백 함수를 반드시 호출하고 약간의 지연을 추가하여 UI 업데이트 보장
+      setTimeout(() => {
+        console.log("Executing onSuccess callback...");
+        onSuccess();
+      }, 100);
       return; // 명시적으로 함수 종료
     } catch (error) {
       console.error("IDKit verification failed:", error);
@@ -237,7 +241,11 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
         console.log("Verification successful! Moving to next step...");
         // 검증 성공 시 다음 단계로 진행
         setIsVerifying(false);
-        onSuccess();
+        // 검증 성공 시 콜백 함수를 반드시 호출하고 약간의 지연을 추가하여 UI 업데이트 보장
+        setTimeout(() => {
+          console.log("Executing onSuccess callback from MiniKit...");
+          onSuccess();
+        }, 100);
         return; // 명시적으로 함수 종료
       } else {
         console.error("Backend verification failed:", verifyResponseJson);
