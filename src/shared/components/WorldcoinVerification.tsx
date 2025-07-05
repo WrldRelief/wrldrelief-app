@@ -1,14 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { createIncognitoAction, verifyProof } from "@/shared/auth/incognito-actions";
+import {
+  createIncognitoAction,
+  verifyProof,
+} from "@/shared/auth/incognito-actions";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
-import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
+import { ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
 import dynamic from "next/dynamic";
 
-// IDKit 위젯을 클라이언트 사이드에서만 렌더링하도록 설정
+// Client-side only imports
+let MiniKit: any;
+
+// IDKit widget for client-side only rendering
 const DynamicIDKitWidget = dynamic(
   () => import("@worldcoin/idkit").then((mod) => mod.IDKitWidget),
   { ssr: false }
 );
+
+// Types based on verify.md
+type VerifyCommandInput = {
+  action: string;
+  signal?: string;
+  verification_level?: VerificationLevel; // Default: Orb
+};
+
+type MiniAppVerifyActionSuccessPayload = {
+  status: "success";
+  proof: string;
+  merkle_root: string;
+  nullifier_hash: string;
+  verification_level: VerificationLevel;
+  version: number;
+};
 
 interface WorldcoinVerificationProps {
   campaignId: number | string;
@@ -16,7 +38,9 @@ interface WorldcoinVerificationProps {
   onError?: (error: Error) => void;
   buttonText?: string;
   className?: string;
-  userRole?: string; // 사용자 역할 (recipient, donor, organization)
+  userRole?: string; // User role (recipient, donor, organization)
+  actionId?: string; // Optional custom action ID
+  signal?: string; // Optional signal data
 }
 
 /**
@@ -29,34 +53,63 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
   onError,
   buttonText = "Verify Identity",
   className = "",
-  userRole = "recipient", // 기본값은 recipient
+  userRole = "recipient",
+  actionId: customActionId,
+  signal = "",
 }) => {
   const [isVerifying, setIsVerifying] = useState(false);
-  const [actionId, setActionId] = useState<string | null>(null);
+  const [actionId, setActionId] = useState<string | null>(
+    customActionId || null
+  );
   const [isMiniApp, setIsMiniApp] = useState<boolean>(false);
-  
-  // 컴포넌트 마운트 시 환경 확인 및 액션 생성
+
+  // Initialize MiniKit and detect environment on component mount
   useEffect(() => {
-    // 미니 앱 환경인지 확인 (window.MiniKit이 있는지)
+    // Check if running in browser environment
+    if (typeof window === "undefined") return;
+
+    // Check if running in World App (has MiniKit)
     const checkEnvironment = () => {
-      // 테스트를 위해 현재는 미니 앱 환경이 아닌 것으로 설정
-      // 실제 미니 앱에서는 window.MiniKit을 확인해야 함
-      const isMiniAppEnv = false;
-      console.log("미니 앱 환경 감지:", isMiniAppEnv);
-      setIsMiniApp(isMiniAppEnv);
-      return isMiniAppEnv;
-    };
-    
-    // 캠페인에 대한 Incognito Action 생성 또는 조회
-    const setupAction = async () => {
       try {
-        // 액션 생성 또는 조회
+        // Import MiniKit dynamically on client-side
+        import("@worldcoin/minikit-js")
+          .then((module) => {
+            MiniKit = module.MiniKit;
+
+            // Check if MiniKit is installed (running in World App)
+            const isMiniAppEnv = MiniKit && MiniKit.isInstalled();
+            console.log("World App environment detected:", isMiniAppEnv);
+            setIsMiniApp(isMiniAppEnv);
+          })
+          .catch((err) => {
+            console.error("Failed to load MiniKit:", err);
+            setIsMiniApp(false);
+          });
+      } catch (error) {
+        console.error("Error checking environment:", error);
+        setIsMiniApp(false);
+      }
+
+      // Default to false until confirmed
+      return false;
+    };
+
+    // Setup action ID for verification
+    const setupAction = async () => {
+      // If custom action ID is provided, use it
+      if (customActionId) {
+        setActionId(customActionId);
+        return customActionId;
+      }
+
+      try {
+        // Create or retrieve Incognito Action for the campaign
         const action = await createIncognitoAction(
           campaignId,
           `Campaign ${campaignId} Verification for ${userRole}`,
           `Verify ${userRole} for campaign ${campaignId}`
         );
-        
+
         setActionId(action.id);
         return action.id;
       } catch (error) {
@@ -64,52 +117,29 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
         return null;
       }
     };
-    
+
     const init = async () => {
-      const isMinApp = checkEnvironment();
-      console.log("액션 설정 시작");
+      checkEnvironment();
+      console.log("Setting up action...");
       const actionResult = await setupAction();
-      console.log("액션 설정 완료:", actionResult);
+      console.log("Action setup complete:", actionResult);
     };
-    
+
     init();
-  }, [campaignId, userRole]);
-  
-  // IDKit 위젯에서 검증 성공 시 호출되는 함수
-  const handleVerify = async (proof: ISuccessResult) => {
+  }, [campaignId, userRole, customActionId]);
+
+  // Handle IDKit verification success
+  const handleIDKitVerify = async (proof: ISuccessResult) => {
     try {
       setIsVerifying(true);
-      
-      // 백엔드에서 검증
+
+      // Verify the proof on the backend
       await verifyProof(proof, campaignId);
-      
-      // 성공 콜백 호출
+
+      // Call success callback
       onSuccess();
     } catch (error) {
-      console.error("Verification failed:", error);
-      if (onError && error instanceof Error) {
-        onError(error);
-      }
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-  
-  // 미니 앱 환경에서 직접 검증 처리
-  const handleMiniAppVerification = async () => {
-    try {
-      setIsVerifying(true);
-      
-      // 미니 앱 환경에서는 이미 인증되어 있으므로 직접 검증 처리
-      // 실제 구현에서는 백엔드와 통신하여 검증 상태 확인 필요
-      
-      // 시뮬레이션된 지연 시간
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // 성공 콜백 호출
-      onSuccess();
-    } catch (error) {
-      console.error("Verification failed:", error);
+      console.error("IDKit verification failed:", error);
       if (onError && error instanceof Error) {
         onError(error);
       }
@@ -118,93 +148,179 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
     }
   };
 
-  // 환경에 따라 다른 컴포넌트 렌더링
-  console.log("현재 환경:", isMiniApp ? "미니 앱" : "웹", "액션 ID:", actionId);
+  // Handle MiniKit verification in World App
+  const handleMiniKitVerification = async () => {
+    if (!MiniKit || !MiniKit.isInstalled()) {
+      console.error("MiniKit is not available");
+      if (onError) {
+        onError(new Error("MiniKit is not available"));
+      }
+      return;
+    }
+
+    try {
+      setIsVerifying(true);
+
+      // Prepare verification payload based on verify.md
+      const verifyPayload: VerifyCommandInput = {
+        action: actionId || `campaign-${campaignId}`,
+        signal: signal || `campaign-verification-${campaignId}-${userRole}`,
+        verification_level: VerificationLevel.Orb,
+      };
+
+      console.log("Sending verify command with payload:", verifyPayload);
+
+      // Send verify command to World App
+      const { finalPayload } = await MiniKit.commandsAsync.verify(
+        verifyPayload
+      );
+
+      // Check for error response
+      if (finalPayload.status === "error") {
+        console.error("Verification error:", finalPayload);
+        if (onError) {
+          onError(
+            new Error(
+              `Verification failed: ${finalPayload.error || "Unknown error"}`
+            )
+          );
+        }
+        return;
+      }
+
+      // Verify the proof on the backend
+      const verifyResponse = await fetch("/api/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          payload: finalPayload as ISuccessResult,
+          action: verifyPayload.action,
+          signal: verifyPayload.signal,
+          campaignId,
+        }),
+      });
+
+      const verifyResponseJson = await verifyResponse.json();
+
+      if (verifyResponseJson.status === 200) {
+        console.log("Verification successful!");
+        onSuccess();
+      } else {
+        console.error("Backend verification failed:", verifyResponseJson);
+        if (onError) {
+          onError(
+            new Error(
+              `Backend verification failed: ${
+                verifyResponseJson.message || "Unknown error"
+              }`
+            )
+          );
+        }
+      }
+    } catch (error) {
+      console.error("MiniKit verification failed:", error);
+      if (onError && error instanceof Error) {
+        onError(error);
+      }
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  // Render different components based on environment
+  console.log(
+    "Current environment:",
+    isMiniApp ? "World App" : "Web",
+    "Action ID:",
+    actionId
+  );
+
+  // Worldcoin logo SVG component for buttons
+  const WorldcoinLogo = () => (
+    <svg
+      className="w-5 h-5 mr-2"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <circle cx="12" cy="12" r="5" fill="currentColor" />
+    </svg>
+  );
+
+  // Button content with loading state
+  const ButtonContent = () => (
+    <div className="flex items-center justify-center">
+      <WorldcoinLogo />
+      {isVerifying ? "Verifying..." : buttonText}
+    </div>
+  );
+
   if (isMiniApp) {
-    // 미니 앱 환경에서는 직접 버튼 사용
+    // World App environment - use MiniKit
     return (
       <Button
-        onClick={handleMiniAppVerification}
+        onClick={handleMiniKitVerification}
         className={className}
         size="lg"
         disabled={isVerifying}
       >
-        <div className="flex items-center justify-center">
-          <svg
-            className="w-5 h-5 mr-2"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
-            <circle cx="12" cy="12" r="5" fill="currentColor" />
-          </svg>
-          {isVerifying ? "Verifying..." : buttonText}
-        </div>
+        <ButtonContent />
       </Button>
     );
   } else {
-    // 일반 웹 환경에서는 IDKit 위젯 사용
-    // 디버깅 정보 출력
-    console.log("IDKit 설정 준비:", {
-      action: actionId || `campaign-verification-${campaignId}`,
-      appId: process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID
+    // Web environment - use IDKit
+    // Use provided action ID or fallback to test ID
+    const effectiveActionId = actionId || "wld_staging_1234567890";
+
+    // Format app_id to match required format `app_${string}`
+    const appId = (process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID ||
+      "app_staging_d4f9c8c1c1f0c0a0c0a0c0a0c0a0c0a0") as `app_${string}`;
+
+    console.log("IDKit configuration:", {
+      action: effectiveActionId,
+      appId: appId,
+      signal: signal || `campaign-verification-${campaignId}-${userRole}`,
     });
-    
-    // 테스트를 위한 고정 액션 ID
-    const testActionId = "wld_staging_1234567890";
-    
+
     return (
       <>
         <DynamicIDKitWidget
-          action={testActionId} // 테스트를 위해 고정 값 사용
-          app_id="app_staging_d4f9c8c1c1f0c0a0c0a0c0a0c0a0c0a0" // 테스트를 위한 고정 값
-          onSuccess={handleVerify}
+          action={effectiveActionId}
+          app_id={appId}
+          onSuccess={handleIDKitVerify}
           action_description={`Verify ${userRole} for campaign ${campaignId}`}
           verification_level={"orb" as VerificationLevel}
-          signal="campaign_verification"
+          signal={signal || `campaign-verification-${campaignId}-${userRole}`}
         >
           {({ open }) => (
             <Button
               onClick={() => {
-                console.log("IDKit 열기 시도");
-                // 직접 열기 시도
+                console.log("Opening IDKit...");
                 try {
                   open();
                 } catch (error) {
-                  console.error("IDKit 열기 오류:", error);
+                  console.error("Error opening IDKit:", error);
                 }
               }}
               className={className}
               size="lg"
-              disabled={isVerifying || !actionId}
+              disabled={isVerifying || !effectiveActionId}
             >
-              <div className="flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 mr-2"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                  <circle cx="12" cy="12" r="5" fill="currentColor" />
-                </svg>
-                {isVerifying ? "Verifying..." : buttonText}
-              </div>
+              <ButtonContent />
             </Button>
           )}
         </DynamicIDKitWidget>
-        {/* 디버깅 정보 표시 */}
+
+        {/* Debug info */}
         <div className="text-xs text-gray-400 mt-1">
-          Action ID: {actionId || "로딩 중..."}
+          Action ID: {effectiveActionId || "Loading..."}
         </div>
       </>
     );

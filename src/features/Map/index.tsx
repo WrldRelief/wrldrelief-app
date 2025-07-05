@@ -115,7 +115,7 @@ export const Map = ({
       trackUserLocation: trackUserLocation,
       showUserHeading: true,
       fitBoundsOptions: {
-        zoom: 1,
+        zoom: 0.8,
         maxZoom: 14,
       },
     });
