@@ -112,15 +112,70 @@ export async function GET(req: NextRequest) {
     // 데이터베이스에서 캠페인에 연결된 액션 조회 (실제 구현 필요)
     // const action = await db.actions.findFirst({ where: { campaignId } });
 
-    // 시뮬레이션된 응답 (실제 DB 구현 전까지 사용)
-    const actionId = `campaign_${campaignId}_${Date.now()}`;
-    const action = {
-      id: actionId,
-      name: `Campaign ${campaignId} Verification`,
-      description: `Verify recipient for campaign ${campaignId}`,
-      created_at: new Date().toISOString(),
-      status: "active",
-    };
+    // 캠페인 ID에 대해 일관된 액션 ID 생성 (타임스탬프 제거)
+    const actionId = `campaign_${campaignId}`;
+    
+    // Worldcoin API를 사용하여 액션 조회 또는 생성
+    let action;
+    
+    if (process.env.WORLDCOIN_API_KEY) {
+      try {
+        // 먼저 액션이 존재하는지 확인
+        const checkResponse = await fetch(`${WORLDCOIN_API_BASE}/action/${actionId}`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${process.env.WORLDCOIN_API_KEY}`
+          }
+        });
+        
+        if (checkResponse.ok) {
+          // 액션이 존재하면 반환
+          action = await checkResponse.json();
+          console.log("Existing action found:", action);
+        } else {
+          // 액션이 없으면 새로 생성
+          const createResponse = await fetch(`${WORLDCOIN_API_BASE}/action`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${process.env.WORLDCOIN_API_KEY}`
+            },
+            body: JSON.stringify({
+              action_id: actionId,
+              name: `Campaign ${campaignId} Verification`,
+              description: `Verify recipient for campaign ${campaignId}`,
+              action_type: "incognito"
+            })
+          });
+          
+          if (!createResponse.ok) {
+            throw new Error(`Failed to create action: ${await createResponse.text()}`);
+          }
+          
+          action = await createResponse.json();
+          console.log("New action created:", action);
+        }
+      } catch (apiError) {
+        console.error("Error with Worldcoin API:", apiError);
+        // API 호출 실패 시 시뮬레이션된 응답으로 폴백
+        action = {
+          id: actionId,
+          name: `Campaign ${campaignId} Verification`,
+          description: `Verify recipient for campaign ${campaignId}`,
+          created_at: new Date().toISOString(),
+          status: "active",
+        };
+      }
+    } else {
+      // API 키가 없는 경우 시뮬레이션된 응답 사용
+      action = {
+        id: actionId,
+        name: `Campaign ${campaignId} Verification`,
+        description: `Verify recipient for campaign ${campaignId}`,
+        created_at: new Date().toISOString(),
+        status: "active",
+      };
+    }
 
     if (!action) {
       return NextResponse.json(
