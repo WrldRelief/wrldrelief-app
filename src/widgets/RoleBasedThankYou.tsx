@@ -242,21 +242,15 @@ export const RoleBasedThankYou = () => {
       {/* Campaign info */}
       <div className="p-4 border-b">
         <div className="flex items-center">
-          {campaign.imageUrl ? (
-            <div className="w-12 h-12 rounded-md overflow-hidden mr-4 flex-shrink-0">
-              <Image
-                src={campaign.imageUrl}
-                alt={campaign.name}
-                width={48}
-                height={48}
-                className="object-cover"
-              />
-            </div>
-          ) : (
-            <div className="w-12 h-12 bg-gray-200 rounded-md mr-4 flex-shrink-0 flex items-center justify-center">
-              <span className="text-gray-500 text-xs">No image</span>
-            </div>
-          )}
+          <div className="w-12 h-12 rounded-md overflow-hidden mr-4 flex-shrink-0">
+            <Image
+              src={campaign.imageUrl || "/images/default.jpg"}
+              alt={campaign.name}
+              width={48}
+              height={48}
+              className="object-cover"
+            />
+          </div>
           <div>
             <h3 className="font-semibold text-gray-900">{campaign.name}</h3>
             <p className="text-sm text-gray-600">

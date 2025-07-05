@@ -57,19 +57,14 @@ export const RoleBasedRegionDetail: React.FC<RoleBasedRegionDetailProps> = ({
     <div className="flex flex-col w-full bg-white rounded-lg shadow-md overflow-hidden">
       {/* Region header with image */}
       <div className="relative w-full h-48">
-        {region.imageUrl ? (
-          <Image
-            src={region.imageUrl}
-            alt={region.name}
-            fill
-            className="object-cover"
-            priority
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-500">No image available</span>
-          </div>
-        )}
+        <Image
+          src={region.imageUrl}
+          alt={region.name}
+          fill
+          className="object-cover"
+          priority
+        />
+
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
           <h1 className="text-2xl font-bold text-white">{region.name}</h1>
           <div className="flex items-center mt-2">

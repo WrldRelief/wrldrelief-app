@@ -52,19 +52,14 @@ export const RoleBasedCampaignDetail: React.FC<
   return (
     <div className="w-full">
       <div className="relative w-full h-64">
-        {campaign.imageUrl ? (
-          <Image
-            src={campaign.imageUrl}
-            alt={campaign.name}
-            fill
-            className="object-cover rounded-lg"
-            priority
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-500">No image available</span>
-          </div>
-        )}
+        <Image
+          src={campaign.imageUrl || "/images/default.jpg"}
+          alt={campaign.name}
+          fill
+          className="object-cover rounded-lg"
+          priority
+        />
+
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
           <h1 className="text-2xl font-bold text-white">{campaign.name}</h1>
           <div className="flex items-center mt-2">

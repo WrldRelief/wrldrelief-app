@@ -60,7 +60,11 @@ const CampaignList: React.FC<CampaignListProps> = ({
   };
 
   const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleDateString();
+    return new Date(timestamp).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
   };
 
   return (
@@ -74,20 +78,14 @@ const CampaignList: React.FC<CampaignListProps> = ({
           )} - ${formatDate(campaign.endDate)}`}
           onClick={() => handleCampaignSelect(campaign.id)}
           startAdornment={
-            campaign.imageUrl ? (
-              <div className="w-12 h-12 rounded-lg overflow-hidden relative">
-                <Image
-                  src={campaign.imageUrl}
-                  alt={campaign.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            ) : (
-              <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center">
-                <span className="text-gray-500 text-xs">No img</span>
-              </div>
-            )
+            <div className="w-12 h-12 rounded-lg overflow-hidden relative">
+              <Image
+                src={campaign.imageUrl || "/images/default.jpg"}
+                alt={campaign.name}
+                fill
+                className="object-cover"
+              />
+            </div>
           }
           endAdornment={
             <div className="flex flex-col items-end">

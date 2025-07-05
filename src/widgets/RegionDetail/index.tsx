@@ -55,19 +55,13 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
     <div className="flex flex-col w-full bg-white rounded-lg shadow-md overflow-hidden">
       {/* Region header with image */}
       <div className="relative w-full h-48">
-        {region.imageUrl ? (
-          <Image
-            src={region.imageUrl}
-            alt={region.name}
-            fill
-            className="object-cover"
-            priority
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-500">No image available</span>
-          </div>
-        )}
+        <Image
+          src={region.imageUrl || "/images/default.jpg"}
+          alt={region.name}
+          fill
+          className="object-cover"
+          priority
+        />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
           <h1 className="text-2xl font-bold text-white">{region.name}</h1>
           <div className="flex items-center mt-2">
@@ -174,7 +168,10 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
           value={activeTab}
           onValueChange={(value) =>
             setActiveTab(
-              value as "needed-items" | "active-campaigns" | "completed-campaigns"
+              value as
+                | "needed-items"
+                | "active-campaigns"
+                | "completed-campaigns"
             )
           }
         >
@@ -282,20 +279,24 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
 
           {activeTab === "needed-items" && (
             <div>
-              <h3 className="font-semibold mb-2">AI Predicted Resource Needs</h3>
+              <h3 className="font-semibold mb-2">
+                AI Predicted Resource Needs
+              </h3>
               <div className="space-y-2">
                 {region.predictedNeeds &&
-                  Object.entries(region.predictedNeeds).map(([need, amount]) => (
-                    <div
-                      key={need}
-                      className="flex justify-between items-center p-3 bg-gray-50 rounded-md"
-                    >
-                      <span className="font-medium">
-                        {need.charAt(0).toUpperCase() + need.slice(1)}
-                      </span>
-                      <span className="text-gray-600">{amount}</span>
-                    </div>
-                  ))}
+                  Object.entries(region.predictedNeeds).map(
+                    ([need, amount]) => (
+                      <div
+                        key={need}
+                        className="flex justify-between items-center p-3 bg-gray-50 rounded-md"
+                      >
+                        <span className="font-medium">
+                          {need.charAt(0).toUpperCase() + need.slice(1)}
+                        </span>
+                        <span className="text-gray-600">{amount}</span>
+                      </div>
+                    )
+                  )}
               </div>
             </div>
           )}

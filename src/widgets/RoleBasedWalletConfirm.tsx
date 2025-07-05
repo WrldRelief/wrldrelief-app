@@ -138,21 +138,16 @@ export const RoleBasedWalletConfirm = () => {
         {/* Campaign info */}
         <div className="p-4 border-b">
           <div className="flex items-center mb-4">
-            {campaign.imageUrl ? (
-              <div className="w-16 h-16 rounded-md overflow-hidden mr-4 flex-shrink-0">
-                <Image
-                  src={campaign.imageUrl}
-                  alt={campaign.name}
-                  width={64}
-                  height={64}
-                  className="object-cover"
-                />
-              </div>
-            ) : (
-              <div className="w-16 h-16 bg-gray-200 rounded-md mr-4 flex-shrink-0 flex items-center justify-center">
-                <span className="text-gray-500 text-xs">No image</span>
-              </div>
-            )}
+            <div className="w-16 h-16 rounded-md overflow-hidden mr-4 flex-shrink-0">
+              <Image
+                src={campaign.imageUrl || "/images/default.jpg"}
+                alt={campaign.name}
+                width={64}
+                height={64}
+                className="object-cover"
+              />
+            </div>
+
             <div>
               <h2 className="font-semibold text-gray-900">{campaign.name}</h2>
               <p className="text-sm text-gray-600">

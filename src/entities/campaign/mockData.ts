@@ -25,7 +25,7 @@ export const MOCK_CAMPAIGNS: CampaignData[] = [
     startDate: 17179869121,
     endDate: 17523968000,
     supportItems: ["Water"],
-    imageUrl: "/images/la_wildfire_food.jpg",
+    imageUrl: "",
     status: "ACTIVE", //ACTIVE, PAUSED, ENDED, CANCELLED
     totalDonations: 10,
     createdAt: 17179869121,

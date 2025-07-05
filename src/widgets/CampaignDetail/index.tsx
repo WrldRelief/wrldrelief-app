@@ -21,26 +21,30 @@ interface CampaignDetailProps {
   campaignId: number;
 }
 
-export const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaignId }) => {
+export const CampaignDetail: React.FC<CampaignDetailProps> = ({
+  campaignId,
+}) => {
   const router = useRouter();
   const { userRole } = useUserRole();
 
   // Find the campaign by ID and extend with UI-specific properties
   const baseCampaign = MOCK_CAMPAIGNS.find((c) => c.id === campaignId);
-  
+
   // Create extended campaign with UI-specific properties
-  const campaign: ExtendedCampaignData | undefined = baseCampaign ? {
-    ...baseCampaign,
-    resourceNeeds: {
-      "water": "500 liters",
-      "food": "200 kg",
-      "medicine": "50 kits",
-      "shelter": "30 units"
-    },
-    currentFunding: 2500,
-    targetFunding: 10000,
-    currency: "USDC"
-  } : undefined;
+  const campaign: ExtendedCampaignData | undefined = baseCampaign
+    ? {
+        ...baseCampaign,
+        resourceNeeds: {
+          water: "500 liters",
+          food: "200 kg",
+          medicine: "50 kits",
+          shelter: "30 units",
+        },
+        currentFunding: 2500,
+        targetFunding: 10000,
+        currency: "USDC",
+      }
+    : undefined;
 
   if (!campaign) {
     return (
@@ -71,19 +75,13 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaignId }) =>
   return (
     <div className="w-full">
       <div className="relative w-full h-64">
-        {campaign.imageUrl ? (
-          <Image
-            src={campaign.imageUrl}
-            alt={campaign.name}
-            fill
-            className="object-cover rounded-lg"
-            priority
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-500">No image available</span>
-          </div>
-        )}
+        <Image
+          src={campaign.imageUrl || "/images/default.jpg"}
+          alt={campaign.name}
+          fill
+          className="object-cover rounded-lg"
+          priority
+        />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
           <h1 className="text-2xl font-bold text-white">{campaign.name}</h1>
           <div className="flex items-center mt-2">
@@ -133,17 +131,18 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaignId }) =>
           AI Predicted Resource Needs
         </h2>
         <div className="space-y-2">
-          {campaign.resourceNeeds && Object.entries(campaign.resourceNeeds).map(([need, amount]) => (
-            <div
-              key={need}
-              className="flex justify-between items-center p-3 bg-gray-50 rounded-md"
-            >
-              <span className="font-medium">
-                {need.charAt(0).toUpperCase() + need.slice(1)}
-              </span>
-              <span className="text-gray-600">{String(amount)}</span>
-            </div>
-          ))}
+          {campaign.resourceNeeds &&
+            Object.entries(campaign.resourceNeeds).map(([need, amount]) => (
+              <div
+                key={need}
+                className="flex justify-between items-center p-3 bg-gray-50 rounded-md"
+              >
+                <span className="font-medium">
+                  {need.charAt(0).toUpperCase() + need.slice(1)}
+                </span>
+                <span className="text-gray-600">{String(amount)}</span>
+              </div>
+            ))}
         </div>
       </div>
 
@@ -151,14 +150,25 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaignId }) =>
       <div className="p-4 border-b">
         <h2 className="text-lg font-semibold mb-2">Funding Progress</h2>
         <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-          <div 
-            className="bg-blue-600 h-2.5 rounded-full" 
-            style={{ width: `${Math.min(100, ((campaign.currentFunding || 0) / (campaign.targetFunding || 1)) * 100)}%` }}
+          <div
+            className="bg-blue-600 h-2.5 rounded-full"
+            style={{
+              width: `${Math.min(
+                100,
+                ((campaign.currentFunding || 0) /
+                  (campaign.targetFunding || 1)) *
+                  100
+              )}%`,
+            }}
           ></div>
         </div>
         <div className="flex justify-between text-sm mb-4">
-          <span>{campaign.currentFunding || 0} {campaign.currency || 'USDC'}</span>
-          <span>{campaign.targetFunding || 0} {campaign.currency || 'USDC'}</span>
+          <span>
+            {campaign.currentFunding || 0} {campaign.currency || "USDC"}
+          </span>
+          <span>
+            {campaign.targetFunding || 0} {campaign.currency || "USDC"}
+          </span>
         </div>
 
         {/* Time remaining */}

@@ -23,7 +23,7 @@ export const MOCK_DISASTER_LOCATIONS: DisasterLocation[] = [
     },
     description:
       "A massive wildfire has swept through the outskirts of Los Angeles, destroying homes and infrastructure. Thousands have been evacuated and urgent relief is needed for shelter, food, and medical support.",
-    imageUrl: "/images/mock_la_wildfire.jpg", // public 폴더에 이미지 준비
+    imageUrl: "", // public 폴더에 이미지 준비
   },
   {
     id: "iran-israel-war-001",
