@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react";
 import { createIncognitoAction, verifyProof } from "@/shared/auth/incognito-actions";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
+import dynamic from "next/dynamic";
+
+// IDKit 위젯을 클라이언트 사이드에서만 렌더링하도록 설정
+const DynamicIDKitWidget = dynamic(
+  () => import("@worldcoin/idkit").then((mod) => mod.IDKitWidget),
+  { ssr: false }
+);
 
 interface WorldcoinVerificationProps {
   campaignId: number | string;
@@ -32,7 +39,10 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
   useEffect(() => {
     // 미니 앱 환경인지 확인 (window.MiniKit이 있는지)
     const checkEnvironment = () => {
-      const isMiniAppEnv = typeof window !== 'undefined' && 'MiniKit' in window;
+      // 테스트를 위해 현재는 미니 앱 환경이 아닌 것으로 설정
+      // 실제 미니 앱에서는 window.MiniKit을 확인해야 함
+      const isMiniAppEnv = false;
+      console.log("미니 앱 환경 감지:", isMiniAppEnv);
       setIsMiniApp(isMiniAppEnv);
       return isMiniAppEnv;
     };
@@ -57,7 +67,9 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
     
     const init = async () => {
       const isMinApp = checkEnvironment();
-      await setupAction();
+      console.log("액션 설정 시작");
+      const actionResult = await setupAction();
+      console.log("액션 설정 완료:", actionResult);
     };
     
     init();
@@ -107,6 +119,7 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
   };
 
   // 환경에 따라 다른 컴포넌트 렌더링
+  console.log("현재 환경:", isMiniApp ? "미니 앱" : "웹", "액션 ID:", actionId);
   if (isMiniApp) {
     // 미니 앱 환경에서는 직접 버튼 사용
     return (
@@ -136,40 +149,64 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
     );
   } else {
     // 일반 웹 환경에서는 IDKit 위젯 사용
+    // 디버깅 정보 출력
+    console.log("IDKit 설정 준비:", {
+      action: actionId || `campaign-verification-${campaignId}`,
+      appId: process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID
+    });
+    
+    // 테스트를 위한 고정 액션 ID
+    const testActionId = "wld_staging_1234567890";
+    
     return (
-      <IDKitWidget
-        app_id={process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID as `app_${string}` || "app_staging_d4f9c8c1c1f0c0a0c0a0c0a0c0a0c0a0"}
-        action={actionId || `campaign-verification-${campaignId}`}
-        onSuccess={handleVerify}
-        action_description={`Verify ${userRole} for campaign ${campaignId}`}
-        verification_level={VerificationLevel.Orb}
-      >
-        {({ open }) => (
-          <Button
-            onClick={open}
-            className={className}
-            size="lg"
-            disabled={isVerifying || !actionId}
-          >
-            <div className="flex items-center justify-center">
-              <svg
-                className="w-5 h-5 mr-2"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-                <circle cx="12" cy="12" r="5" fill="currentColor" />
-              </svg>
-              {isVerifying ? "Verifying..." : buttonText}
-            </div>
-          </Button>
-        )}
-      </IDKitWidget>
+      <>
+        <DynamicIDKitWidget
+          action={testActionId} // 테스트를 위해 고정 값 사용
+          app_id="app_staging_d4f9c8c1c1f0c0a0c0a0c0a0c0a0c0a0" // 테스트를 위한 고정 값
+          onSuccess={handleVerify}
+          action_description={`Verify ${userRole} for campaign ${campaignId}`}
+          verification_level={"orb" as VerificationLevel}
+          signal="campaign_verification"
+        >
+          {({ open }) => (
+            <Button
+              onClick={() => {
+                console.log("IDKit 열기 시도");
+                // 직접 열기 시도
+                try {
+                  open();
+                } catch (error) {
+                  console.error("IDKit 열기 오류:", error);
+                }
+              }}
+              className={className}
+              size="lg"
+              disabled={isVerifying || !actionId}
+            >
+              <div className="flex items-center justify-center">
+                <svg
+                  className="w-5 h-5 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <circle cx="12" cy="12" r="5" fill="currentColor" />
+                </svg>
+                {isVerifying ? "Verifying..." : buttonText}
+              </div>
+            </Button>
+          )}
+        </DynamicIDKitWidget>
+        {/* 디버깅 정보 표시 */}
+        <div className="text-xs text-gray-400 mt-1">
+          Action ID: {actionId || "로딩 중..."}
+        </div>
+      </>
     );
   }
 };
