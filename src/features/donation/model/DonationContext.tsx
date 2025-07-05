@@ -144,12 +144,12 @@ export const DonationProvider: React.FC<{
 
       // Get the recipient address from the campaign (in a real app, this would come from your backend)
       // For now, using a test address
-      const recipientAddress = "0x4072ca2A7DFa6C1865aA6165ddA3e2a4dcad1D8F";
+      const recipientAddress = "0xfcbd7ac2b8a90443f89934910fd1d0dde76c9bd2";
 
       // Prepare the payment payload
       const tokenSymbol =
         donationState.selectedToken === "WLD" ? Tokens.WLD : Tokens.USDC;
-      
+
       // 중요: reference 키를 올바르게 설정
       const payload = {
         reference: reference, // data.reference 대신 reference 변수 사용

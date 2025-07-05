@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button, Tabs, TabItem } from "@worldcoin/mini-apps-ui-kit-react";
+import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 import { useDonation } from "../model/DonationContext";
 import { MOCK_CAMPAIGNS } from "@/entities/campaign";
 import { TokenType } from "../model/types";
-import { Wallet, Coins, MessageAlert } from "iconoir-react";
+import { Coins, MessageAlert } from "iconoir-react";
 
 export const TransactionConfirm: React.FC = () => {
   const {
@@ -67,7 +67,7 @@ export const TransactionConfirm: React.FC = () => {
   }
 
   // Calculate estimated gas fee (mock value)
-  const estimatedGasFee = 0.002;
+  // const estimatedGasFee = 0.002;
 
   const handleConfirm = () => {
     // Update context with selected payment method and token
@@ -82,11 +82,11 @@ export const TransactionConfirm: React.FC = () => {
     goToStep("amount");
   };
 
-  // World App만 결제 방법으로 사용하미로 핸들러는 고정 값만 처리
-  const handlePaymentMethodChange = (value: "worldapp") => {
-    setPaymentTab(value);
-    setPaymentMethod(value);
-  };
+  // // World App만 결제 방법으로 사용하미로 핸들러는 고정 값만 처리
+  // const handlePaymentMethodChange = (value: "worldapp") => {
+  //   setPaymentTab(value);
+  //   setPaymentMethod(value);
+  // };
 
   const handleTokenChange = (token: TokenType) => {
     setTokenSelection(token);

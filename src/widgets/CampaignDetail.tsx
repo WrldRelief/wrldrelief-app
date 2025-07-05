@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { MOCK_CAMPAIGNS } from "@/entities/campaign";
-import { CampaignData } from "@/entities/campaign/types";
+import { CampaignData, CampaignStatus } from "@/entities/campaign/types";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button, Progress } from "@worldcoin/mini-apps-ui-kit-react";
@@ -124,13 +124,13 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
           </span>
           <span className="mx-2 text-gray-400">•</span>
           <span className="text-sm text-gray-500">
-            {enhancedCampaign.status === "ACTIVE" ? (
+            {enhancedCampaign.status === CampaignStatus.ACTIVE ? (
               <span className="text-green-600 font-medium">
                 Active Campaign
               </span>
-            ) : enhancedCampaign.status === "ENDED" ? (
+            ) : enhancedCampaign.status === CampaignStatus.ENDED ? (
               <span className="text-blue-600 font-medium">Completed</span>
-            ) : enhancedCampaign.status === "PAUSED" ? (
+            ) : enhancedCampaign.status === CampaignStatus.PAUSED ? (
               <span className="text-yellow-600 font-medium">Paused</span>
             ) : (
               <span className="text-red-600 font-medium">Cancelled</span>
@@ -220,7 +220,7 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <p className="font-medium text-gray-600">Organization</p>
-            <p>{enhancedCampaign.organizer}</p>
+            <p className="truncate">{enhancedCampaign.organizer}</p>
           </div>
           <div>
             <p className="font-medium text-gray-600">Support Items</p>
@@ -382,10 +382,11 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
                       ...prev,
                       worldcoinVerified: true,
                     }));
-                    
+
                     // Step 3로 명시적으로 스크롤
                     setTimeout(() => {
-                      const step4Element = document.getElementById("step-4-claim-aid");
+                      const step4Element =
+                        document.getElementById("step-4-claim-aid");
                       if (step4Element) {
                         step4Element.scrollIntoView({ behavior: "smooth" });
                       }
@@ -404,7 +405,10 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
           {enhancedCampaign.isRegistered &&
             enhancedCampaign.registrationStatus === "approved" &&
             enhancedCampaign.worldcoinVerified && (
-              <div id="step-4-claim-aid" className="bg-green-50 p-4 rounded-lg mb-4">
+              <div
+                id="step-4-claim-aid"
+                className="bg-green-50 p-4 rounded-lg mb-4"
+              >
                 <div className="flex items-center mb-2">
                   <svg
                     className="w-5 h-5 text-green-600 mr-2"

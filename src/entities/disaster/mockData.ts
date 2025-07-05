@@ -1,13 +1,13 @@
 // src/entities/disaster/mockData.ts
 
-import { DisasterLocation } from "./types";
+import { DisasterLocationExtended } from "./types";
 
 /**
  * @constant MOCK_DISASTER_LOCATIONS
  * @description 재난 지역을 시뮬레이션하기 위한 목(Mock) 데이터 배열입니다.
  * 실제 지도에 빨간 점으로 표시될 위치 정보를 포함합니다.
  */
-export const MOCK_DISASTER_LOCATIONS: DisasterLocation[] = [
+export const MOCK_DISASTER_LOCATIONS: DisasterLocationExtended[] = [
   {
     id: "la-wildfire-001",
     name: "Los Angeles Wildfire Emergency",

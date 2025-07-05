@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { DisasterLocation } from "@/entities/disaster/types";
+import { DisasterLocationExtended } from "@/entities/disaster/types";
+import { CampaignStatus } from "@/entities/campaign/types";
 import { MOCK_CAMPAIGNS } from "@/entities/campaign";
 import Image from "next/image";
 import CampaignList from "@/features/CampaignList";
@@ -9,7 +10,7 @@ import { Tabs, TabItem } from "@worldcoin/mini-apps-ui-kit-react";
 import { CheckSquare, Donate } from "iconoir-react";
 
 interface RegionDetailProps {
-  region: DisasterLocation;
+  region: DisasterLocationExtended;
 }
 
 export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
@@ -22,10 +23,10 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
     (campaign) => campaign.disasterId === region.id
   );
   const activeCampaigns = campaigns.filter(
-    (campaign) => campaign.status === "ACTIVE"
+    (campaign) => campaign.status === CampaignStatus.ACTIVE
   );
   const completedCampaigns = campaigns.filter(
-    (campaign) => campaign.status === "ENDED"
+    (campaign) => campaign.status === CampaignStatus.ENDED
   );
 
   return (
