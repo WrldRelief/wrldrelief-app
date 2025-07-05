@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
-import { MOCK_CAMPAIGNS } from "@/entities/campaign";
-import { CampaignData, CampaignStatus } from "@/entities/campaign/types";
+import React, { useState, useEffect } from "react";
+import { CampaignStatus } from "@/entities/campaign/types";
+import { useCampaign, Campaign } from "@/entities/contracts";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button, Progress } from "@worldcoin/mini-apps-ui-kit-react";
@@ -10,14 +10,11 @@ import { useUserRole } from "@/context/UserRoleContext";
 import WorldcoinVerification from "@/shared/components/WorldcoinVerification";
 
 // Extended campaign data with additional properties for UI
-interface ExtendedCampaignData
-  extends Omit<CampaignData, "totalDonations" | "canEdit"> {
+interface ExtendedCampaignData extends Campaign {
   resourceNeeds?: Record<string, string | number>;
   currentFunding?: number;
   targetFunding?: number;
   currency?: string;
-  canEdit: boolean;
-  totalDonations: number;
   isRegistered?: boolean; // Added property for recipient registration status
   registrationStatus?: "pending" | "approved" | "rejected"; // Status of the registration process
   worldcoinVerified?: boolean; // Whether the user has verified with Worldcoin
@@ -34,49 +31,66 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
   const router = useRouter();
   const { userRole } = useUserRole();
 
-  // Find the campaign by ID
-  const campaign = MOCK_CAMPAIGNS.find((c) => c.id === campaignId) as
-    | ExtendedCampaignData
-    | undefined;
+  // Fetch campaign data from blockchain
+  const { campaign, loading, error } = useCampaign(campaignId);
 
   // Add UI-specific properties for the campaign and store in state
-  const [enhancedCampaign, setEnhancedCampaign] = useState<
-    ExtendedCampaignData | undefined
-  >(() => {
-    return campaign
-      ? {
-          ...campaign,
-          resourceNeeds: {
-            Water: "1000 liters",
-            Food: "500 kg",
-            Medicine: "200 kits",
-            Shelter: "50 units",
-          },
-          currentFunding: 3500,
-          targetFunding: 10000,
-          currency: "USDC",
-          isRegistered: false,
-          registrationStatus: undefined,
-          worldcoinVerified: false,
-        }
-      : undefined;
-  });
+  const [enhancedCampaign, setEnhancedCampaign] = useState<ExtendedCampaignData | undefined>();
+  
+  // Update enhanced campaign when blockchain data changes
+  useEffect(() => {
+    if (campaign) {
+      setEnhancedCampaign({
+        ...campaign,
+        resourceNeeds: {
+          Water: "1000 liters",
+          Food: "500 kg",
+          Medicine: "200 kits",
+          Shelter: "50 units",
+        },
+        currentFunding: campaign.currentFunding || 75000,
+        targetFunding: campaign.targetFunding || 100000,
+        currency: campaign.currency || "USDC",
+        isRegistered: campaign.isRegistered || false,
+        registrationStatus: campaign.registrationStatus || "pending",
+        worldcoinVerified: campaign.worldcoinVerified || false,
+        location: campaign.location || "Central Distribution Center",
+      });
+    } else {
+      setEnhancedCampaign(undefined);
+    }
+  }, [campaign]);
 
-  if (!enhancedCampaign) {
+  // State for modals and donation will be implemented in future updates
+  // Currently removed to fix ESLint unused variable warnings
+
+  // If campaign is loading
+  if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center p-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+      <div className="flex flex-col items-center justify-center p-6 text-center">
+        <h2 className="text-xl font-semibold text-gray-700 mb-2">
+          Loading Campaign...
+        </h2>
+      </div>
+    );
+  }
+
+  // If campaign not found or error
+  if (!enhancedCampaign || error) {
+    return (
+      <div className="flex flex-col items-center justify-center p-6 text-center">
+        <h2 className="text-xl font-semibold text-gray-700 mb-2">
           Campaign Not Found
-        </h1>
-        <p className="text-gray-600 mb-6">
-          The campaign you&apos;re looking for doesn&apos;t exist or has been
-          removed.
+        </h2>
+        <p className="text-gray-500 mb-4">
+          {error ? `Error: ${error.message}` : 'The campaign you are looking for does not exist or has been removed.'}
         </p>
         <Button
-          onClick={() => router.push("/explore")}
-          aria-label="Return to explore page"
+          onClick={() => router.back()}
+          variant="secondary"
+          size="lg"
         >
-          Return to Explore
+          Go Back
         </Button>
       </div>
     );

@@ -9,9 +9,9 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Button, Tabs, TabItem } from "@worldcoin/mini-apps-ui-kit-react";
 import { Activity, CheckCircle, Package } from "iconoir-react";
-import { MOCK_CAMPAIGNS } from "@/entities/campaign";
 import CampaignList from "@/features/CampaignList";
-import { CampaignStatus } from "@/entities/campaign/types";
+import { Campaign, CampaignStatus, useCampaignsByDisaster } from "@/entities/contracts";
+import { CampaignData } from "@/entities/campaign";
 
 const Map = dynamic(() => import("@/features/Map").then((mod) => mod.Map), {
   ssr: false,
@@ -33,14 +33,21 @@ export const RoleBasedRegionDetail: React.FC<RoleBasedRegionDetailProps> = ({
   const { userRole } = useUserRole();
   const router = useRouter();
 
-  // Filter campaigns by the selected disaster region
-  const campaigns = MOCK_CAMPAIGNS.filter(
-    (campaign) => campaign.disasterId === region.id
-  );
-  const activeCampaigns = campaigns.filter(
+  // Fetch campaigns by the selected disaster region from blockchain
+  const { campaigns, loading, error } = useCampaignsByDisaster(region.id);
+  
+  // Adapter function to convert Campaign to CampaignData
+  const adaptCampaignToCampaignData = (campaign: Campaign): CampaignData => ({
+    ...campaign,
+    updatedAt: campaign.createdAt, // Use createdAt as updatedAt since it's not in the contract
+  });
+  
+  // Convert and filter campaigns by status
+  const adaptedCampaigns = campaigns ? campaigns.map(adaptCampaignToCampaignData) : [];
+  const activeCampaigns = adaptedCampaigns.filter(
     (campaign) => campaign.status === CampaignStatus.ACTIVE
   );
-  const completedCampaigns = campaigns.filter(
+  const completedCampaigns = adaptedCampaigns.filter(
     (campaign) => campaign.status === CampaignStatus.ENDED
   );
 
@@ -53,6 +60,29 @@ export const RoleBasedRegionDetail: React.FC<RoleBasedRegionDetailProps> = ({
   const handleRegisterNeeds = () => {
     router.push(`/recipient/register-needs?regionId=${region.id}`);
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex flex-col w-full bg-white rounded-lg shadow-md overflow-hidden p-6">
+        <h1 className="text-2xl font-bold">{region.name}</h1>
+        <p className="text-gray-600 mt-2">Loading campaigns...</p>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex flex-col w-full bg-white rounded-lg shadow-md overflow-hidden p-6">
+        <h1 className="text-2xl font-bold">{region.name}</h1>
+        <p className="text-red-600 mt-2">Error loading campaigns: {error.message}</p>
+        <Button onClick={() => window.location.reload()} variant="secondary" size="lg" className="mt-4">
+          Retry
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col w-full bg-white rounded-lg shadow-md overflow-hidden">
