@@ -10,7 +10,7 @@ interface UserRoleContextType {
 }
 
 export const UserRoleContext = createContext<UserRoleContextType>({
-  userRole: "recipient", // 기본값
+  userRole: "donor", // 기본값
   setUserRole: () => {},
 });
 
@@ -19,7 +19,7 @@ export const UserRoleProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [userRole, setUserRole] = useState<UserRole>("recipient");
+  const [userRole, setUserRole] = useState<UserRole>("donor");
 
   return (
     <UserRoleContext.Provider value={{ userRole, setUserRole }}>
