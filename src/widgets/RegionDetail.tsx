@@ -45,7 +45,7 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
       </div>
 
       {/* Region image */}
-      <div className="relative w-full h-[300px]">
+      <div className="relative w-full min-h-[300px] h-[300px]">
         <Image
           src={region.imageUrl || "/images/default.jpg"}
           alt={`Disaster situation in ${region.name}`}
