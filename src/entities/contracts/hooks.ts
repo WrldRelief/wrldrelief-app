@@ -134,7 +134,7 @@ export function useCampaignsByDisaster(disasterId: string) {
           abi: CampaignFactoryABI,
           functionName: 'getCampaignsByDisaster',
           args: [disasterId],
-        }) as any[];
+        }) as Array<{ campaignAddress: string; disasterId: string; organizer: string; name: string; startDate: bigint; endDate: bigint; createdAt: bigint }>;
         
         // Get detailed campaign data for each campaign
         const detailedCampaigns = await Promise.all(
@@ -259,7 +259,7 @@ export function useAllDisasters() {
           address: CONTRACT_ADDRESSES.disasterRegistry as `0x${string}`,
           abi: DisasterRegistryABI,
           functionName: 'getAllDisasters',
-        }) as any[];
+        }) as Array<{ id: string; name: string; description: string; location: string; imageUrl: string; startDate: bigint; registeredAt: bigint; isActive: boolean }>;
         
         const formattedDisasters = disasterData.map(disaster => ({
           id: disaster.id,
@@ -310,7 +310,7 @@ export function useDisaster(disasterId: string) {
           abi: DisasterRegistryABI,
           functionName: 'getDisaster',
           args: [disasterId],
-        }) as any;
+        }) as { id: string; name: string; description: string; location: string; imageUrl: string; startDate: bigint; registeredAt: bigint; isActive: boolean };
         
         setDisaster({
           id: disasterData.id,
