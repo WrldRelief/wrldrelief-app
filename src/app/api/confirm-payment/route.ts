@@ -63,32 +63,48 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // In a production app, we would verify the transaction with the World Developer Portal API:
+    // Verify the transaction with the World Developer Portal API
     try {
-      // Uncomment in production with proper environment variables
-      // const response = await fetch(
-      //   `https://developer.worldcoin.org/api/v2/minikit/transaction/${payload.transaction_id}?app_id=${process.env.NEXT_PUBLIC_APP_ID}`,
-      //   {
-      //     method: 'GET',
-      //     headers: {
-      //       Authorization: `Bearer ${process.env.DEV_PORTAL_API_KEY}`,
-      //     },
-      //   }
-      // );
-      //
-      // if (!response.ok) {
-      //   throw new Error(`API responded with status: ${response.status}`);
-      // }
-      //
-      // const transaction = await response.json();
-      // console.log('Transaction verification:', transaction);
-      //
-      // if (transaction.reference !== reference || transaction.status === 'failed') {
-      //   return NextResponse.json({ success: false, error: 'Invalid transaction' });
-      // }
-
-      // For demo purposes, we'll just assume the transaction is valid
-      console.log("Payment verified successfully");
+      // 환경 변수가 설정되어 있는지 확인
+      const appId = process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID;
+      const apiKey = process.env.WORLDCOIN_API_KEY;
+      
+      if (!apiKey || !appId) {
+        console.warn("WORLDCOIN_API_KEY or NEXT_PUBLIC_WORLDCOIN_APP_ID not set. Skipping transaction verification with World Developer Portal.");
+        console.log("For demo purposes, assuming the transaction is valid.");
+      } else {
+        // 실제 API 호출로 트랜잭션 검증
+        console.log(`Verifying transaction ${payload.transaction_id} with World Developer Portal`);
+        const response = await fetch(
+          `https://developer.worldcoin.org/api/v2/minikit/transaction/${payload.transaction_id}?app_id=${appId}`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+            },
+          }
+        );
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`API responded with status: ${response.status}`, errorText);
+          throw new Error(`API responded with status: ${response.status}`);
+        }
+        
+        const transaction = await response.json();
+        console.log('Transaction verification response:', transaction);
+        
+        if (transaction.reference !== reference || transaction.status === 'failed') {
+          return NextResponse.json({ 
+            success: false, 
+            error: 'Invalid transaction: reference mismatch or failed status' 
+          }, { status: 400 });
+        }
+        
+        console.log("Payment verified successfully with World Developer Portal");
+      }
+      
+      // 트랜잭션이 유효하다고 판단
 
       // In a real app, we would update our database to mark the donation as complete
       // Remove the payment from pending payments

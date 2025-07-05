@@ -149,8 +149,10 @@ export const DonationProvider: React.FC<{
       // Prepare the payment payload
       const tokenSymbol =
         donationState.selectedToken === "WLD" ? Tokens.WLD : Tokens.USDC;
+      
+      // 중요: reference 키를 올바르게 설정
       const payload = {
-        reference: data.reference,
+        reference: reference, // data.reference 대신 reference 변수 사용
         to: recipientAddress,
         tokens: [
           {
@@ -180,7 +182,7 @@ export const DonationProvider: React.FC<{
           },
           body: JSON.stringify({
             payload: finalPayload,
-            reference: data.reference,
+            reference: reference, // data.reference 대신 reference 변수 사용
             campaignId,
             amount: donationState.amount,
             token: donationState.selectedToken,
