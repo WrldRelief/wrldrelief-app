@@ -29,7 +29,7 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
   );
 
   return (
-    <div className="flex flex-col w-full bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="flex flex-col w-full bg-white rounded-lg shadow-md">
       {/* Region header */}
       <div className="border-b">
         <h1 className="text-2xl font-bold text-gray-900">{region.name}</h1>
