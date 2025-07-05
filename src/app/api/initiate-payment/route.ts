@@ -9,7 +9,7 @@ interface PaymentRequest {
 }
 
 // In a real app, we would store this in a database
-const pendingPayments = new Map<string, PaymentRequest>();
+export const pendingPayments = new Map<string, PaymentRequest>();
 
 export async function POST(req: NextRequest) {
   try {

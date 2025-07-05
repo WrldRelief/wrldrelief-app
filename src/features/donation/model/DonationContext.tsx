@@ -97,11 +97,36 @@ export const DonationProvider: React.FC<{
   // Process World App payment using MiniKit
   const processWorldAppPayment = async () => {
     try {
+      console.log("Starting World App payment process");
+
+      // Import MiniKit dynamically (client-side only)
+      const { MiniKit, tokenToDecimals, Tokens } = await import(
+        "@worldcoin/minikit-js"
+      );
+
+      // Check if MiniKit is installed (running in World App)
+      if (!MiniKit.isInstalled()) {
+        console.error("World App is not installed");
+        setDonationState((prev) => ({
+          ...prev,
+          step: "confirm",
+          error:
+            "World App is not installed. Please open this app in World App to continue.",
+        }));
+        router.push(`/explore/${disasterId}/${campaignId}/donate/confirm`);
+        return;
+      }
+
       // Set to processing state
-      setDonationState((prev) => ({ ...prev, step: "processing" }));
+      setDonationState((prev) => ({
+        ...prev,
+        step: "processing",
+        error: undefined,
+      }));
       router.push(`/explore/${disasterId}/${campaignId}/donate/processing`);
 
       // Initiate payment by calling our API
+      console.log("Initiating payment with API");
       const response = await fetch("/api/initiate-payment", {
         method: "POST",
         headers: {
@@ -116,6 +141,7 @@ export const DonationProvider: React.FC<{
       });
 
       const data = await response.json();
+      console.log("Initiate payment response:", data);
 
       if (!data.success) {
         throw new Error(data.error || "Failed to initiate payment");
@@ -123,16 +149,6 @@ export const DonationProvider: React.FC<{
 
       // Store the payment reference
       setPaymentReference(data.reference);
-
-      // Import MiniKit dynamically (client-side only)
-      const { MiniKit, tokenToDecimals, Tokens } = await import(
-        "@worldcoin/minikit-js"
-      );
-
-      // Check if MiniKit is installed (running in World App)
-      if (!MiniKit.isInstalled()) {
-        throw new Error("World App is not installed");
-      }
 
       // Get the recipient address from the campaign (in a real app, this would come from your backend)
       // For now, using a test address
@@ -156,11 +172,15 @@ export const DonationProvider: React.FC<{
         description: `Donation to campaign ${campaignId} for disaster relief`,
       };
 
+      console.log("Sending payment command to World App", payload);
+
       // Send the payment command to World App
       const { finalPayload } = await MiniKit.commandsAsync.pay(payload);
+      console.log("Payment command response:", finalPayload);
 
       if (finalPayload.status === "success") {
         // Verify the payment with our backend
+        console.log("Verifying payment with backend");
         const verifyResponse = await fetch("/api/confirm-payment", {
           method: "POST",
           headers: {
@@ -176,6 +196,7 @@ export const DonationProvider: React.FC<{
         });
 
         const verifyData = await verifyResponse.json();
+        console.log("Payment verification response:", verifyData);
 
         if (verifyData.success) {
           // Payment successful
@@ -186,6 +207,7 @@ export const DonationProvider: React.FC<{
         }
       } else {
         // Handle payment error - status will be 'failed' or 'canceled'
+        console.error("Payment failed or was canceled", finalPayload);
         throw new Error("Payment failed or was canceled by user");
       }
     } catch (error) {
@@ -222,7 +244,7 @@ export const DonationProvider: React.FC<{
 
 export const useDonation = () => {
   const context = useContext(DonationContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useDonation must be used within a DonationProvider");
   }
   return context;
