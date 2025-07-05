@@ -5,33 +5,23 @@ import { pendingPayments, PaymentRequest } from '@/shared/store/payments';
 
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json() as PaymentRequest;
-    const { campaignId, disasterId, amount, token } = data;
-    
-    // Validate request data
-    if (!campaignId || !disasterId || !amount || !token) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Missing required fields' 
-      }, { status: 400 });
-    }
-    
     // Generate a unique reference ID for this payment
     const reference = crypto.randomUUID().replace(/-/g, '');
     
-    // Store payment details (in a real app, this would go to a database)
+    // Store the reference in our pending payments map
+    // We'll add more details when the payment is confirmed
     pendingPayments.set(reference, {
-      campaignId,
-      disasterId,
-      amount,
-      token
+      campaignId: 0, // Will be updated during confirmation
+      disasterId: '',
+      amount: 0,
+      token: 'USDC'
     });
     
-    // Return the reference ID to the client
+    // Return the reference ID to the client as per pay.md example
     return NextResponse.json({ 
       success: true, 
-      reference,
-      message: 'Payment initiated successfully'
+      id: reference, // Using 'id' as the key name to match pay.md example
+      message: 'Payment reference created successfully'
     });
   } catch (error) {
     console.error('Error initiating payment:', error);

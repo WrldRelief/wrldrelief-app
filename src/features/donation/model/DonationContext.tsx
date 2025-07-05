@@ -125,19 +125,10 @@ export const DonationProvider: React.FC<{
       }));
       router.push(`/explore/${disasterId}/${campaignId}/donate/processing`);
 
-      // Initiate payment by calling our API
+      // Initiate payment by calling our API to get a reference ID
       console.log("Initiating payment with API");
       const response = await fetch("/api/initiate-payment", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          campaignId,
-          disasterId,
-          amount: donationState.amount,
-          token: donationState.selectedToken,
-        }),
       });
 
       const data = await response.json();
@@ -147,8 +138,9 @@ export const DonationProvider: React.FC<{
         throw new Error(data.error || "Failed to initiate payment");
       }
 
-      // Store the payment reference
-      setPaymentReference(data.reference);
+      // Store the payment reference (using 'id' as per pay.md example)
+      const reference = data.id;
+      setPaymentReference(reference);
 
       // Get the recipient address from the campaign (in a real app, this would come from your backend)
       // For now, using a test address
