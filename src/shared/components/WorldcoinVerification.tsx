@@ -136,14 +136,17 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
       // Verify the proof on the backend
       await verifyProof(proof, campaignId);
 
-      // Call success callback
+      console.log("IDKit verification successful! Moving to next step...");
+      
+      // Call success callback and move to next step
+      setIsVerifying(false);
       onSuccess();
+      return; // 명시적으로 함수 종료
     } catch (error) {
       console.error("IDKit verification failed:", error);
       if (onError && error instanceof Error) {
         onError(error);
       }
-    } finally {
       setIsVerifying(false);
     }
   };
@@ -231,8 +234,11 @@ const WorldcoinVerification: React.FC<WorldcoinVerificationProps> = ({
       const verifyResponseJson = await verifyResponse.json();
 
       if (verifyResponseJson.status === 200) {
-        console.log("Verification successful!");
+        console.log("Verification successful! Moving to next step...");
+        // 검증 성공 시 다음 단계로 진행
+        setIsVerifying(false);
         onSuccess();
+        return; // 명시적으로 함수 종료
       } else {
         console.error("Backend verification failed:", verifyResponseJson);
         if (onError) {
