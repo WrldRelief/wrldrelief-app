@@ -3,7 +3,7 @@
 import { ListItem } from "@worldcoin/mini-apps-ui-kit-react";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { CampaignData } from "@/entities/campaign";
+import { CampaignData, CampaignStatus } from "@/entities/campaign";
 import Image from "next/image";
 
 interface CampaignListProps {
@@ -42,6 +42,10 @@ const CampaignList: React.FC<CampaignListProps> = ({
       default:
         return "text-gray-600";
     }
+  };
+
+  const getStatusString = (status: CampaignStatus): string => {
+    return CampaignStatus[status];
   };
 
   const getStatusLabel = (status: string) => {
@@ -91,10 +95,10 @@ const CampaignList: React.FC<CampaignListProps> = ({
             <div className="flex flex-col items-end">
               <span
                 className={`text-xs font-medium ${getStatusColor(
-                  campaign.status
+                  getStatusString(campaign.status)
                 )}`}
               >
-                {getStatusLabel(campaign.status)}
+                {getStatusLabel(getStatusString(campaign.status))}
               </span>
               <span className="text-xs text-gray-500">
                 {campaign.supportItems.length} items needed
