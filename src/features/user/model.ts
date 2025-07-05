@@ -1,6 +1,6 @@
 import { useAtom } from "jotai";
 import { userAtom } from "@/shared/lib/store/user";
-import { UserInfo, WorldcoinUserInfo } from "@/entities/user/types";
+import { UserInfoExtended, WorldcoinUserInfo } from "@/entities/user/types";
 import { MiniKit } from "@worldcoin/minikit-js";
 
 // 사용자 정보 관리를 위한 훅
@@ -8,7 +8,7 @@ export const useUserModel = () => {
   const [user, setUser] = useAtom(userAtom);
 
   // 사용자 정보 설정
-  const updateUserInfo = (userInfo: Partial<UserInfo>) => {
+  const updateUserInfo = (userInfo: Partial<UserInfoExtended>) => {
     setUser((prev) => ({
       ...prev,
       ...userInfo,
