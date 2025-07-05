@@ -7,18 +7,8 @@ import { useDonation } from "../model/DonationContext";
 export const TransactionProcessing: React.FC = () => {
   const { donationState, setTransactionId, goToStep } = useDonation();
 
-  useEffect(() => {
-    // Simulate transaction processing
-    const timer = setTimeout(() => {
-      // Generate a mock transaction ID
-      const mockTransactionId =
-        "0x" + Math.random().toString(16).substring(2, 62);
-      setTransactionId(mockTransactionId);
-      goToStep("success");
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [goToStep, setTransactionId]);
+  // 자동 타이머 제거 - 실제 결제 처리는 DonationContext의 processWorldAppPayment 함수에서 처리함
+  // 이 화면은 단순히 결제 처리 중임을 표시하는 화면으로만 사용
 
   return (
     <div className="w-full max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
