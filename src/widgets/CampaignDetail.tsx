@@ -355,90 +355,92 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
             </p>
           </div>
         </div>
-      ) : null}
+      ) : (
+        <>
+          <div className="p-6 border-t mt-4">
+            <h2 className="text-xl font-semibold mb-4">Make a Donation</h2>
 
-      {/* Make a Donation Section */}
-      <div className="p-6 border-t mt-4">
-        <h2 className="text-xl font-semibold mb-4">Make a Donation</h2>
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-gray-700 mb-6">
+                Your donation helps provide essential resources to those
+                affected by this disaster. All donations are processed securely
+                through blockchain technology for maximum transparency.
+              </p>
 
-        <div className="flex flex-col items-center gap-4">
-          <p className="text-gray-700 mb-6">
-            Your donation helps provide essential resources to those affected by
-            this disaster. All donations are processed securely through
-            blockchain technology for maximum transparency.
-          </p>
+              <Button
+                className="w-full py-3"
+                onClick={() =>
+                  router.push(
+                    `/explore/${enhancedCampaign.disasterId}/${enhancedCampaign.id}/donate`
+                  )
+                }
+                size="lg"
+                aria-label="Donate to this campaign"
+              >
+                Donate Now
+              </Button>
 
-          <Button
-            className="w-full py-3"
-            onClick={() =>
-              router.push(
-                `/explore/${enhancedCampaign.disasterId}/${enhancedCampaign.id}/donate`
-              )
-            }
-            size="lg"
-            aria-label="Donate to this campaign"
-          >
-            Donate Now
-          </Button>
+              {/* Info section */}
+              <div className="bg-gray-50 p-4 rounded-lg mt-4">
+                <div className="flex items-center mb-2">
+                  <svg
+                    className="w-5 h-5 text-blue-500 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+                  <h3 className="font-medium text-gray-700">
+                    About USDC Donations
+                  </h3>
+                </div>
+                <p className="text-sm text-gray-600">
+                  USDC is a stablecoin pegged to the US dollar, allowing for
+                  secure and transparent donations. Your contribution will be
+                  recorded on the blockchain and directly transferred to the
+                  campaign.
+                </p>
+              </div>
+            </div>
+          </div>
 
-          {/* Info section */}
-          <div className="bg-gray-50 p-4 rounded-lg mt-4">
-            <div className="flex items-center mb-2">
+          {/* Donation transparency section */}
+          <div className="p-6">
+            <h3 className="font-medium text-gray-800 mb-3">
+              Donation Transparency
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              All donations are recorded on the blockchain for full
+              transparency. You can track how funds are being used and verify
+              the impact of your contribution.
+            </p>
+
+            <div className="flex items-center space-x-2">
               <svg
-                className="w-5 h-5 text-blue-500 mr-2"
+                className="w-5 h-5 text-blue-500"
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clipRule="evenodd"
-                ></path>
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
               </svg>
-              <h3 className="font-medium text-gray-700">
-                About USDC Donations
-              </h3>
+              <a
+                href="#"
+                className="text-blue-600 text-sm hover:underline"
+                tabIndex={0}
+              >
+                View Transactions on Explorer
+              </a>
             </div>
-            <p className="text-sm text-gray-600">
-              USDC is a stablecoin pegged to the US dollar, allowing for secure
-              and transparent donations. Your contribution will be recorded on
-              the blockchain and directly transferred to the campaign.
-            </p>
           </div>
-        </div>
-      </div>
-
-      {/* Donation transparency section */}
-      <div className="p-6">
-        <h3 className="font-medium text-gray-800 mb-3">
-          Donation Transparency
-        </h3>
-        <p className="text-sm text-gray-600 mb-4">
-          All donations are recorded on the blockchain for full transparency.
-          You can track how funds are being used and verify the impact of your
-          contribution.
-        </p>
-
-        <div className="flex items-center space-x-2">
-          <svg
-            className="w-5 h-5 text-blue-500"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-            <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-          </svg>
-          <a
-            href="#"
-            className="text-blue-600 text-sm hover:underline"
-            tabIndex={0}
-          >
-            View Transactions on Explorer
-          </a>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };
