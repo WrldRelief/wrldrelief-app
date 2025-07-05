@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MOCK_CAMPAIGNS } from "@/entities/campaign";
+import { CampaignStatus, MOCK_CAMPAIGNS } from "@/entities/campaign";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useUserRole } from "@/context/UserRoleContext";
@@ -65,15 +65,15 @@ export const RoleBasedCampaignDetail: React.FC<
           <div className="flex items-center mt-2">
             <span
               className={`px-2 py-1 text-xs font-medium rounded-full ${
-                campaign.status === "ACTIVE"
+                campaign.status === CampaignStatus.ACTIVE
                   ? "bg-green-100 text-green-800"
-                  : campaign.status === "ENDED"
+                  : campaign.status === CampaignStatus.ENDED
                   ? "bg-blue-100 text-blue-800"
                   : "bg-gray-100 text-gray-800"
               }`}
             >
-              {campaign.status.charAt(0).toUpperCase() +
-                campaign.status.slice(1)}
+              {CampaignStatus[campaign.status].charAt(0).toUpperCase() +
+                CampaignStatus[campaign.status].slice(1).toLowerCase()}
             </span>
           </div>
         </div>

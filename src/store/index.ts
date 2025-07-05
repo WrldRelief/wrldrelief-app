@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { DisasterLocation } from "@/entities/disaster";
 import { CampaignData } from "@/entities/campaign";
-import { UserInfo } from "@/entities/user/types";
+import { UserInfoExtended } from "@/entities/user/types";
 import { MOCK_DISASTER_LOCATIONS as MOCK_DISASTERS } from "@/entities/disaster/mockData";
 import { MOCK_CAMPAIGNS } from "@/entities/campaign/mockData";
 
@@ -57,7 +57,7 @@ type AidReceipt = AidReceiptData;
 // 스토어 상태 타입 정의
 interface StoreState {
   // 엔티티 데이터
-  users: UserInfo[];
+  users: UserInfoExtended[];
   disasters: DisasterLocation[];
   campaigns: CampaignData[];
   donations: Donation[];
@@ -66,8 +66,8 @@ interface StoreState {
   aidReceipts: AidReceiptData[];
 
   // 액션: 사용자
-  addUser: (user: UserInfo) => void;
-  updateUser: (address: string, userData: Partial<UserInfo>) => void;
+  addUser: (user: UserInfoExtended) => void;
+  updateUser: (address: string, userData: Partial<UserInfoExtended>) => void;
 
   // 액션: 재난
   addDisaster: (disaster: DisasterLocation) => void;

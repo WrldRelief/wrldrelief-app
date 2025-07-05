@@ -186,7 +186,8 @@ export const verifyProof = async (
     try {
       const action = await getIncognitoAction(campaignId);
       actionId = action?.id || generateActionId(campaignId);
-    } catch (_) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_error) {
       // 액션 조회 실패 시 기본 ID 사용
       actionId = generateActionId(campaignId);
     }
@@ -222,8 +223,11 @@ export const verifyProof = async (
  * @param campaignId - 캠페인 ID
  * @returns 인증 여부
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const checkUserVerification = async (
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _userId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _campaignId: number | string
 ): Promise<boolean> => {
   try {

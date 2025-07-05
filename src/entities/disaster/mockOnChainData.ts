@@ -68,7 +68,8 @@ export const MOCK_ONCHAIN_DISASTERS: DisasterData[] = [
  * 온체인 데이터와 UI 데이터를 매핑하는 유틸리티 함수
  * 온체인 데이터를 UI에 표시하기 위한 확장 데이터로 변환
  */
-export const mapOnChainToUIData = (_: DisasterData[]) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const mapOnChainToUIData = (data: DisasterData[]) => {
   // 여기서 온체인 데이터를 UI 데이터로 변환하는 로직 구현
   // 필요시 구현
 };

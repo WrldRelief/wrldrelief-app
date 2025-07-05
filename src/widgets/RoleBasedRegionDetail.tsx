@@ -11,6 +11,7 @@ import { Button, Tabs, TabItem } from "@worldcoin/mini-apps-ui-kit-react";
 import { Activity, CheckCircle, Package } from "iconoir-react";
 import { MOCK_CAMPAIGNS } from "@/entities/campaign";
 import CampaignList from "@/features/CampaignList";
+import { CampaignStatus } from "@/entities/campaign/types";
 
 const Map = dynamic(() => import("@/features/Map").then((mod) => mod.Map), {
   ssr: false,
@@ -37,10 +38,10 @@ export const RoleBasedRegionDetail: React.FC<RoleBasedRegionDetailProps> = ({
     (campaign) => campaign.disasterId === region.id
   );
   const activeCampaigns = campaigns.filter(
-    (campaign) => campaign.status === "ACTIVE"
+    (campaign) => campaign.status === CampaignStatus.ACTIVE
   );
   const completedCampaigns = campaigns.filter(
-    (campaign) => campaign.status === "ENDED"
+    (campaign) => campaign.status === CampaignStatus.ENDED
   );
 
   // Organization-specific actions

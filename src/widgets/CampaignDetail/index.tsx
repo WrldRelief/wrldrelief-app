@@ -2,7 +2,7 @@
 
 import React from "react";
 import { MOCK_CAMPAIGNS } from "@/entities/campaign";
-import { CampaignData } from "@/entities/campaign/types";
+import { CampaignData, CampaignStatus } from "@/entities/campaign/types";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useUserRole } from "@/context/UserRoleContext";
@@ -20,6 +20,22 @@ interface ExtendedCampaignData extends CampaignData {
 interface CampaignDetailProps {
   campaignId: number;
 }
+
+// Helper function to convert campaign status to user-friendly string
+const getCampaignStatusString = (status: CampaignStatus): string => {
+  switch (status) {
+    case CampaignStatus.ACTIVE:
+      return "Active";
+    case CampaignStatus.PAUSED:
+      return "Paused";
+    case CampaignStatus.ENDED:
+      return "Ended";
+    case CampaignStatus.CANCELLED:
+      return "Cancelled";
+    default:
+      return "Unknown";
+  }
+};
 
 export const CampaignDetail: React.FC<CampaignDetailProps> = ({
   campaignId,
@@ -87,15 +103,14 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
           <div className="flex items-center mt-2">
             <span
               className={`px-2 py-1 text-xs font-medium rounded-full ${
-                campaign.status === "ACTIVE"
+                campaign.status === CampaignStatus.ACTIVE
                   ? "bg-green-100 text-green-800"
-                  : campaign.status === "ENDED"
+                  : campaign.status === CampaignStatus.ENDED
                   ? "bg-blue-100 text-blue-800"
                   : "bg-gray-100 text-gray-800"
               }`}
             >
-              {campaign.status.charAt(0).toUpperCase() +
-                campaign.status.slice(1).toLowerCase()}
+              {getCampaignStatusString(campaign.status)}
             </span>
           </div>
         </div>
