@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState } from "react";
-import { DonationState, DonationStep } from "./types";
+import { DonationState, DonationStep, PaymentMethod, TokenType } from "./types";
 import { useRouter } from "next/navigation";
 
 interface DonationContextType {
@@ -9,8 +9,12 @@ interface DonationContextType {
   setAmount: (amount: number) => void;
   setWalletAddress: (address: string) => void;
   setTransactionId: (id: string) => void;
+  setPaymentMethod: (method: PaymentMethod) => void;
+  setSelectedToken: (token: TokenType) => void;
+  setPaymentReference: (reference: string) => void;
   goToStep: (step: DonationStep) => void;
   resetDonation: () => void;
+  processWorldAppPayment: () => Promise<void>;
 }
 
 const DonationContext = createContext<DonationContextType | undefined>(undefined);
@@ -27,6 +31,8 @@ export const DonationProvider: React.FC<{
     amount: 10,
     walletAddress: "",
     step: "amount",
+    paymentMethod: "standard",
+    selectedToken: "USDC",
   });
 
   const setAmount = (amount: number) => {
@@ -39,6 +45,18 @@ export const DonationProvider: React.FC<{
 
   const setTransactionId = (transactionId: string) => {
     setDonationState((prev) => ({ ...prev, transactionId }));
+  };
+
+  const setPaymentMethod = (paymentMethod: PaymentMethod) => {
+    setDonationState((prev) => ({ ...prev, paymentMethod }));
+  };
+
+  const setSelectedToken = (selectedToken: TokenType) => {
+    setDonationState((prev) => ({ ...prev, selectedToken }));
+  };
+
+  const setPaymentReference = (paymentReference: string) => {
+    setDonationState((prev) => ({ ...prev, paymentReference }));
   };
 
   const goToStep = (step: DonationStep) => {
@@ -68,8 +86,110 @@ export const DonationProvider: React.FC<{
       amount: 10,
       walletAddress: "",
       step: "amount",
+      paymentMethod: "standard",
+      selectedToken: "USDC",
     });
     router.push(`/explore/${disasterId}/${campaignId}/donate`);
+  };
+
+  // Process World App payment using MiniKit
+  const processWorldAppPayment = async () => {
+    try {
+      // Set to processing state
+      setDonationState((prev) => ({ ...prev, step: "processing" }));
+      router.push(`/explore/${disasterId}/${campaignId}/donate/processing`);
+      
+      // Initiate payment by calling our API
+      const response = await fetch('/api/initiate-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campaignId,
+          disasterId,
+          amount: donationState.amount,
+          token: donationState.selectedToken,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to initiate payment');
+      }
+      
+      // Store the payment reference
+      setPaymentReference(data.reference);
+      
+      // Import MiniKit dynamically (client-side only)
+      const { MiniKit, tokenToDecimals, Tokens } = await import('@worldcoin/minikit-js');
+      
+      // Check if MiniKit is installed (running in World App)
+      if (!MiniKit.isInstalled()) {
+        throw new Error('World App is not installed');
+      }
+      
+      // Get the recipient address from the campaign (in a real app, this would come from your backend)
+      // For now, using a test address
+      const recipientAddress = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
+      
+      // Prepare the payment payload
+      const tokenSymbol = donationState.selectedToken === 'WLD' ? Tokens.WLD : Tokens.USDC;
+      const payload = {
+        reference: data.reference,
+        to: recipientAddress,
+        tokens: [
+          {
+            symbol: tokenSymbol,
+            token_amount: tokenToDecimals(donationState.amount, tokenSymbol).toString(),
+          },
+        ],
+        description: `Donation to campaign ${campaignId} for disaster relief`,
+      };
+      
+      // Send the payment command to World App
+      const { finalPayload } = await MiniKit.commandsAsync.pay(payload);
+      
+      if (finalPayload.status === 'success') {
+        // Verify the payment with our backend
+        const verifyResponse = await fetch('/api/confirm-payment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            payload: finalPayload,
+            reference: data.reference,
+            campaignId,
+            amount: donationState.amount,
+            token: donationState.selectedToken,
+          }),
+        });
+        
+        const verifyData = await verifyResponse.json();
+        
+        if (verifyData.success) {
+          // Payment successful
+          setTransactionId(finalPayload.transaction_id);
+          goToStep('success');
+        } else {
+          throw new Error(verifyData.error || 'Payment verification failed');
+        }
+      } else {
+        // Handle payment error - status will be 'failed' or 'canceled'
+        throw new Error('Payment failed or was canceled by user');
+      }
+    } catch (error) {
+      console.error('World App payment error:', error);
+      // Handle error - return to confirm page with error message
+      setDonationState((prev) => ({ 
+        ...prev, 
+        step: "confirm",
+        error: error instanceof Error ? error.message : 'Unknown payment error'
+      }));
+      router.push(`/explore/${disasterId}/${campaignId}/donate/confirm`);
+    }
   };
 
   return (
@@ -79,8 +199,12 @@ export const DonationProvider: React.FC<{
         setAmount,
         setWalletAddress,
         setTransactionId,
+        setPaymentMethod,
+        setSelectedToken,
+        setPaymentReference,
         goToStep,
         resetDonation,
+        processWorldAppPayment,
       }}
     >
       {children}
