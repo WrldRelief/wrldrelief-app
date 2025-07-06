@@ -6,7 +6,7 @@ import { RegionDetail } from "@/widgets/RegionDetail";
 import { Button, Spinner } from "@worldcoin/mini-apps-ui-kit-react";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useDisasterData, extendDisasterData } from "@/entities/disaster/disasterData";
+import { useDisasterData } from "@/entities/disaster/disasterData";
 import { useState, useEffect } from "react";
 
 const DisasterDetail = () => {
@@ -57,7 +57,7 @@ const DisasterDetail = () => {
         </Page.Header>
         <Page.Main className="flex flex-col items-center justify-center h-full">
           <h2 className="text-xl font-bold mb-2">Disaster Not Found</h2>
-          <p className="text-gray-600 mb-4">The disaster you're looking for doesn't exist or couldn't be loaded.</p>
+          <p className="text-gray-500 mb-4">There aren&apos;t any active campaigns for this disaster yet. If you&apos;re an organization, you can create a campaign to help those affected by this disaster.</p>
           <Button onClick={() => router.push('/explore')} variant="primary">
             Return to Explore
           </Button>

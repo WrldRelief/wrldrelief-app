@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Page } from "@/features/PageLayout";
 import { TopBar } from "@worldcoin/mini-apps-ui-kit-react";
 import { useDisasterData } from "@/entities/disaster/disasterData";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 const Explore = () => {
   const router = useRouter();

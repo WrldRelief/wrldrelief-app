@@ -52,9 +52,9 @@ export function useCampaignData() {
  */
 export function useDisasterCampaigns(disasterId: string) {
   const { campaigns, loading, error } = useCampaignsByDisaster(disasterId);
-  const adaptedCampaigns = adaptCampaignsToCampaignData(campaigns);
+  // useCampaignsByDisaster already returns CampaignData[], no need to adapt
   
-  return { campaigns: adaptedCampaigns, loading, error };
+  return { campaigns, loading, error };
 }
 
 // 온체인 데이터만 사용하지만 기존 코드와의 호환성을 위해 빈 배열로 유지합니다.

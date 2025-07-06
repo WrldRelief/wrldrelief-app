@@ -48,9 +48,9 @@ export function useCampaignData() {
  */
 export function useDisasterCampaigns(disasterId: string) {
   const { campaigns, loading, error } = useCampaignsByDisaster(disasterId);
-  const adaptedCampaigns = adaptCampaignsToCampaignData(campaigns);
+  // useCampaignsByDisaster already returns CampaignData[], no need to adapt
   
-  return { campaigns: adaptedCampaigns, loading, error };
+  return { campaigns, loading, error };
 }
 
 // 목업 데이터는 제거되었습니다.

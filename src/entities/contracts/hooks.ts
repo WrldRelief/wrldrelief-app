@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { publicClient, CONTRACT_ADDRESSES } from './config';
 import { CampaignData, CampaignStatus } from '../campaign/types';
-import { DisasterData } from '../disaster/types';
 
 // Import ABIs
 import CampaignABI from './abis/Campaign.json';
