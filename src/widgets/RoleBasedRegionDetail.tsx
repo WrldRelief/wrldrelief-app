@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { DisasterLocation } from "@/entities/disaster";
-import Image from "next/image";
 // import { ResourceNeeds } from "@/features/ResourceNeeds";
 import { useUserRole } from "@/context/UserRoleContext";
 import { useRouter } from "next/navigation";
@@ -10,8 +9,7 @@ import dynamic from "next/dynamic";
 import { Button, Tabs, TabItem } from "@worldcoin/mini-apps-ui-kit-react";
 import { Activity, CheckCircle, Package } from "iconoir-react";
 import CampaignList from "@/features/CampaignList";
-import { Campaign, CampaignStatus, useCampaignsByDisaster } from "@/entities/contracts";
-import { CampaignData } from "@/entities/campaign";
+import { CampaignStatus, useCampaignsByDisaster } from "@/entities/contracts";
 
 const Map = dynamic(() => import("@/features/Map").then((mod) => mod.Map), {
   ssr: false,
@@ -35,15 +33,9 @@ export const RoleBasedRegionDetail: React.FC<RoleBasedRegionDetailProps> = ({
 
   // Fetch campaigns by the selected disaster region from blockchain
   const { campaigns, loading, error } = useCampaignsByDisaster(region.id);
-  
-  // Adapter function to convert Campaign to CampaignData
-  const adaptCampaignToCampaignData = (campaign: Campaign): CampaignData => ({
-    ...campaign,
-    updatedAt: campaign.createdAt, // Use createdAt as updatedAt since it's not in the contract
-  });
-  
-  // Convert and filter campaigns by status
-  const adaptedCampaigns = campaigns ? campaigns.map(adaptCampaignToCampaignData) : [];
+
+  // Campaigns are already CampaignData type, no need for adapter
+  const adaptedCampaigns = campaigns || [];
   const activeCampaigns = adaptedCampaigns.filter(
     (campaign) => campaign.status === CampaignStatus.ACTIVE
   );
@@ -76,8 +68,15 @@ export const RoleBasedRegionDetail: React.FC<RoleBasedRegionDetailProps> = ({
     return (
       <div className="flex flex-col w-full bg-white rounded-lg shadow-md overflow-hidden p-6">
         <h1 className="text-2xl font-bold">{region.name}</h1>
-        <p className="text-red-600 mt-2">Error loading campaigns: {error.message}</p>
-        <Button onClick={() => window.location.reload()} variant="secondary" size="lg" className="mt-4">
+        <p className="text-red-600 mt-2">
+          Error loading campaigns: {error.message}
+        </p>
+        <Button
+          onClick={() => window.location.reload()}
+          variant="secondary"
+          size="lg"
+          className="mt-4"
+        >
           Retry
         </Button>
       </div>
@@ -88,12 +87,13 @@ export const RoleBasedRegionDetail: React.FC<RoleBasedRegionDetailProps> = ({
     <div className="flex flex-col w-full bg-white rounded-lg shadow-md overflow-hidden">
       {/* Region header with image */}
       <div className="relative w-full h-48">
-        <Image
+        <img
           src={region.imageUrl}
           alt={region.name}
-          fill
           className="object-cover"
-          priority
+          onError={(e) => {
+            e.currentTarget.src = "/images/default.jpg";
+          }}
         />
 
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">

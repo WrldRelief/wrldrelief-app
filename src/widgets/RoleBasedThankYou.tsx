@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MOCK_CAMPAIGNS } from "@/entities/campaign";
-import Image from "next/image";
 import { useUserRole } from "@/context/UserRoleContext";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 
@@ -243,12 +242,15 @@ export const RoleBasedThankYou = () => {
       <div className="p-4 border-b">
         <div className="flex items-center">
           <div className="w-12 h-12 rounded-md overflow-hidden mr-4 flex-shrink-0">
-            <Image
+            <img
               src={campaign.imageUrl || "/images/default.jpg"}
               alt={campaign.name}
               width={48}
               height={48}
               className="object-cover"
+              onError={(e) => {
+                e.currentTarget.src = "/images/default.jpg";
+              }}
             />
           </div>
           <div>

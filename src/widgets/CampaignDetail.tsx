@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { CampaignStatus } from "@/entities/campaign/types";
 import { useCampaign, Campaign } from "@/entities/contracts";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button, Progress } from "@worldcoin/mini-apps-ui-kit-react";
 import { useUserRole } from "@/context/UserRoleContext";
@@ -35,8 +34,10 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
   const { campaign, loading, error } = useCampaign(campaignId);
 
   // Add UI-specific properties for the campaign and store in state
-  const [enhancedCampaign, setEnhancedCampaign] = useState<ExtendedCampaignData | undefined>();
-  
+  const [enhancedCampaign, setEnhancedCampaign] = useState<
+    ExtendedCampaignData | undefined
+  >();
+
   // Update enhanced campaign when blockchain data changes
   useEffect(() => {
     if (campaign) {
@@ -83,13 +84,11 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
           Campaign Not Found
         </h2>
         <p className="text-gray-500 mb-4">
-          {error ? `Error: ${error.message}` : 'The campaign you are looking for does not exist or has been removed.'}
+          {error
+            ? `Error: ${error.message}`
+            : "The campaign you are looking for does not exist or has been removed."}
         </p>
-        <Button
-          onClick={() => router.back()}
-          variant="secondary"
-          size="lg"
-        >
+        <Button onClick={() => router.back()} variant="secondary" size="lg">
           Go Back
         </Button>
       </div>
@@ -160,12 +159,13 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
 
       {/* Campaign image */}
       <div className="relative w-full h-[300px]">
-        <Image
+        <img
           src={enhancedCampaign.imageUrl || "/images/default.jpg"}
           alt={enhancedCampaign.name}
-          fill
           className="object-cover rounded-lg"
-          priority
+          onError={(e) => {
+            e.currentTarget.src = "/images/default.jpg";
+          }}
         />
       </div>
 

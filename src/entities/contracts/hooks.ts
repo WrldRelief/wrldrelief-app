@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { publicClient, CONTRACT_ADDRESSES } from './config';
+import { CampaignData, CampaignStatus } from '../campaign/types';
+import { DisasterData } from '../disaster/types';
 
 // Import ABIs
 import CampaignABI from './abis/Campaign.json';
@@ -75,7 +77,7 @@ export function useAllCampaigns() {
             const campaignData = await publicClient.readContract({
               address: campaignInfo[0] as `0x${string}`, // campaignAddress
               abi: CampaignABI,
-              functionName: 'getCampaignData',
+              functionName: 'getCampaignInfo',
             });
             
             return {
@@ -113,7 +115,7 @@ export function useAllCampaigns() {
 
 // Hook to get campaigns by disaster ID
 export function useCampaignsByDisaster(disasterId: string) {
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [campaigns, setCampaigns] = useState<CampaignData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -128,38 +130,83 @@ export function useCampaignsByDisaster(disasterId: string) {
       try {
         setLoading(true);
         
-        // Get campaign info for the disaster
-        const campaignInfos = await publicClient.readContract({
+        // Get campaign IDs for the disaster
+        const campaignIds = await publicClient.readContract({
           address: CONTRACT_ADDRESSES.campaignFactory as `0x${string}`,
           abi: CampaignFactoryABI,
-          functionName: 'getCampaignsByDisaster',
+          functionName: 'getActiveCampaignsByDisaster',
           args: [disasterId],
-        }) as Array<{ campaignAddress: string; disasterId: string; organizer: string; name: string; startDate: bigint; endDate: bigint; createdAt: bigint }>;
+        }) as bigint[];
+        
+        // Define the campaign info type based on the contract struct
+        type CampaignInfo = {
+          campaignAddress: string;
+          disasterId: string;
+          organizer: string;
+          name: string;
+          startDate: bigint;
+          endDate: bigint;
+          createdAt: bigint;
+          isActive: boolean;
+        };
+        
+        // Get campaign info for each ID
+        const campaignInfos = await Promise.all(
+          campaignIds.map(async (id) => {
+            const info = await publicClient.readContract({
+              address: CONTRACT_ADDRESSES.campaignFactory as `0x${string}`,
+              abi: CampaignFactoryABI,
+              functionName: 'getCampaignInfo',
+              args: [id],
+            }) as CampaignInfo;
+            return info;
+          })
+        );
         
         // Get detailed campaign data for each campaign
         const detailedCampaigns = await Promise.all(
           campaignInfos.map(async (info) => {
-            const campaignData = await publicClient.readContract({
-              address: info.campaignAddress as `0x${string}`,
-              abi: CampaignABI,
-              functionName: 'getCampaignData',
-            });
-            
-            return {
-              id: Number(campaignData[0]),
-              disasterId: campaignData[1],
-              organizer: campaignData[2],
-              name: campaignData[3],
-              description: campaignData[4],
-              startDate: Number(campaignData[5]),
-              endDate: Number(campaignData[6]),
-              supportItems: campaignData[7],
-              imageUrl: campaignData[8],
-              status: Number(campaignData[9]),
-              totalDonations: Number(campaignData[10]),
-              createdAt: Number(campaignData[11]),
-              canEdit: campaignData[12],
-            } as Campaign;
+            try {
+              const campaignData = await publicClient.readContract({
+                address: info.campaignAddress as `0x${string}`,
+                abi: CampaignABI,
+                functionName: 'getCampaignInfo',
+              });
+              
+              return {
+                id: Number(campaignData[0]),
+                disasterId: campaignData[1],
+                organizer: campaignData[2],
+                name: campaignData[3],
+                description: campaignData[4],
+                startDate: Number(campaignData[5]),
+                endDate: Number(campaignData[6]),
+                supportItems: campaignData[7],
+                imageUrl: campaignData[8],
+                status: Number(campaignData[9]),
+                totalDonations: Number(campaignData[10]),
+                createdAt: Number(campaignData[11]),
+                updatedAt: Number(campaignData[11]), // 업데이트 시간이 없으면 생성 시간과 동일하게 설정
+              } as CampaignData;
+            } catch (err) {
+              console.error(`Error fetching data for campaign at ${info.campaignAddress}:`, err);
+              // Return a minimal campaign object with data from campaignInfo
+              return {
+                id: 0, // We don't have this from campaignInfo
+                disasterId: info.disasterId,
+                organizer: info.organizer,
+                name: info.name,
+                description: "", // Not available in campaignInfo
+                startDate: Number(info.startDate),
+                endDate: Number(info.endDate),
+                supportItems: [], // Not available in campaignInfo
+                imageUrl: "", // Not available in campaignInfo
+                status: info.isActive ? CampaignStatus.ACTIVE : CampaignStatus.ENDED,
+                totalDonations: 0, // Not available in campaignInfo
+                createdAt: Number(info.createdAt),
+                updatedAt: Number(info.createdAt), // 업데이트 시간이 없으면 생성 시간과 동일하게 설정
+              } as CampaignData;
+            }
           })
         );
         
@@ -211,7 +258,7 @@ export function useCampaign(campaignId: number) {
         const campaignData = await publicClient.readContract({
           address: campaignInfo[0] as `0x${string}`, // campaignAddress
           abi: CampaignABI,
-          functionName: 'getCampaignData',
+          functionName: 'getCampaignInfo',
         });
         
         setCampaign({

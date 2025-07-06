@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { DisasterLocationExtended } from "@/entities/disaster/types";
-import Image from "next/image";
 import { useUserRole } from "@/context/UserRoleContext";
 import { useRouter } from "next/navigation";
 import { Button, Tabs, TabItem } from "@worldcoin/mini-apps-ui-kit-react";
@@ -55,12 +54,13 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
     <div className="flex flex-col w-full bg-white rounded-lg shadow-md overflow-hidden">
       {/* Region header with image */}
       <div className="relative w-full h-48">
-        <Image
+        <img
           src={region.imageUrl || "/images/default.jpg"}
           alt={region.name}
-          fill
-          className="object-cover"
-          priority
+          className="object-cover w-full h-full"
+          onError={(e) => {
+            e.currentTarget.src = "/images/default.jpg";
+          }}
         />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
           <h1 className="text-2xl font-bold text-white">{region.name}</h1>

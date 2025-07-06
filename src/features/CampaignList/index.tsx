@@ -4,7 +4,6 @@ import { ListItem } from "@worldcoin/mini-apps-ui-kit-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { CampaignData, CampaignStatus } from "@/entities/campaign";
-import Image from "next/image";
 
 interface CampaignListProps {
   campaigns: CampaignData[];
@@ -83,11 +82,13 @@ const CampaignList: React.FC<CampaignListProps> = ({
           onClick={() => handleCampaignSelect(campaign.id)}
           startAdornment={
             <div className="w-12 h-12 rounded-lg overflow-hidden relative">
-              <Image
+              <img
                 src={campaign.imageUrl || "/images/default.jpg"}
                 alt={campaign.name}
-                fill
                 className="object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "/images/default.jpg";
+                }}
               />
             </div>
           }

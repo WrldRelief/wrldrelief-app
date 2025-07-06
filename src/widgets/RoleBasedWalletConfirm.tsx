@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
 import { Button, CircularIcon } from "@worldcoin/mini-apps-ui-kit-react";
 import { useUserRole } from "@/context/UserRoleContext";
 import { useUserModel } from "@/features/user/model";
@@ -139,12 +138,15 @@ export const RoleBasedWalletConfirm = () => {
         <div className="p-4 border-b">
           <div className="flex items-center mb-4">
             <div className="w-16 h-16 rounded-md overflow-hidden mr-4 flex-shrink-0">
-              <Image
+              <img
                 src={campaign.imageUrl || "/images/default.jpg"}
                 alt={campaign.name}
                 width={64}
                 height={64}
                 className="object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "/images/default.jpg";
+                }}
               />
             </div>
 

@@ -3,14 +3,13 @@
 import React from "react";
 import { useCampaignData } from "@/entities/campaign/mockData";
 import { CampaignData, CampaignStatus } from "@/entities/campaign/types";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useUserRole } from "@/context/UserRoleContext";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 import DonationForm from "../DonationForm";
 
 // Extended campaign data with additional properties for UI
-interface ExtendedCampaignData extends Omit<CampaignData, 'updatedAt'> {
+interface ExtendedCampaignData extends Omit<CampaignData, "updatedAt"> {
   resourceNeeds?: Record<string, string | number>;
   currentFunding?: number;
   targetFunding?: number;
@@ -93,12 +92,13 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
   return (
     <div className="w-full">
       <div className="relative w-full h-64">
-        <Image
+        <img
           src={campaign.imageUrl || "/images/default.jpg"}
           alt={campaign.name}
-          fill
           className="object-cover rounded-lg"
-          priority
+          onError={(e) => {
+            e.currentTarget.src = "/images/default.jpg";
+          }}
         />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
           <h1 className="text-2xl font-bold text-white">{campaign.name}</h1>

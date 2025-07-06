@@ -2,7 +2,6 @@
 
 import React from "react";
 import { CampaignStatus, MOCK_CAMPAIGNS } from "@/entities/campaign";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useUserRole } from "@/context/UserRoleContext";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
@@ -52,12 +51,13 @@ export const RoleBasedCampaignDetail: React.FC<
   return (
     <div className="w-full">
       <div className="relative w-full h-64">
-        <Image
+        <img
           src={campaign.imageUrl || "/images/default.jpg"}
           alt={campaign.name}
-          fill
           className="object-cover rounded-lg"
-          priority
+          onError={(e) => {
+            e.currentTarget.src = "/images/default.jpg";
+          }}
         />
 
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">

@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { DisasterLocationExtended } from "@/entities/disaster/types";
 import { CampaignStatus } from "@/entities/campaign/types";
-import { MOCK_CAMPAIGNS } from "@/entities/campaign";
+import { useDisasterCampaigns } from "@/entities/campaign/mockData";
 import CampaignList from "@/features/CampaignList";
-import { Tabs, TabItem } from "@worldcoin/mini-apps-ui-kit-react";
-import { CheckSquare, Donate } from "iconoir-react";
+import { Tabs, TabItem, Spinner } from "@worldcoin/mini-apps-ui-kit-react";
+import { CheckSquare, Donate, WarningCircle } from "iconoir-react";
 
 interface RegionDetailProps {
   region: DisasterLocationExtended;
@@ -17,13 +17,14 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
     "active-campaigns" | "completed-campaigns"
   >("active-campaigns");
 
-  // Filter campaigns by the selected disaster region
-  const campaigns = MOCK_CAMPAIGNS.filter(
-    (campaign) => campaign.disasterId === region.id
-  );
+  // Fetch campaigns for this disaster using the contract hook with type adapter
+  const { campaigns, loading, error } = useDisasterCampaigns(region.id);
+
+  // Filter campaigns by status
   const activeCampaigns = campaigns.filter(
     (campaign) => campaign.status === CampaignStatus.ACTIVE
   );
+
   const completedCampaigns = campaigns.filter(
     (campaign) => campaign.status === CampaignStatus.ENDED
   );
@@ -50,6 +51,9 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
           src={region.imageUrl || "/images/default.jpg"}
           alt={`Disaster situation in ${region.name}`}
           className="object-cover rounded-lg"
+          onError={(e) => {
+            e.currentTarget.src = "/images/default.jpg";
+          }}
         />
       </div>
 
@@ -82,21 +86,50 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
 
       {/* Tab content */}
       <div>
-        {/* Active Campaigns Tab Content */}
-        {activeTab === "active-campaigns" && (
-          <div>
-            <CampaignList disasterId={region.id} campaigns={activeCampaigns} />
+        {loading ? (
+          <div className="flex flex-col items-center justify-center p-8">
+            <Spinner />
+            <p className="mt-4 text-gray-600">Loading campaigns...</p>
           </div>
-        )}
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center p-8 text-red-500">
+            <WarningCircle width={48} height={48} />
+            <p className="mt-4">Error loading campaigns: {error.message}</p>
+          </div>
+        ) : (
+          <>
+            {/* Active Campaigns Tab Content */}
+            {activeTab === "active-campaigns" && (
+              <div>
+                {activeCampaigns.length > 0 ? (
+                  <CampaignList
+                    disasterId={region.id}
+                    campaigns={activeCampaigns}
+                  />
+                ) : (
+                  <div className="p-8 text-center text-gray-500">
+                    <p>No active campaigns found for this disaster.</p>
+                  </div>
+                )}
+              </div>
+            )}
 
-        {/* Completed Campaigns Tab Content */}
-        {activeTab === "completed-campaigns" && (
-          <div>
-            <CampaignList
-              disasterId={region.id}
-              campaigns={completedCampaigns}
-            />
-          </div>
+            {/* Completed Campaigns Tab Content */}
+            {activeTab === "completed-campaigns" && (
+              <div>
+                {completedCampaigns.length > 0 ? (
+                  <CampaignList
+                    disasterId={region.id}
+                    campaigns={completedCampaigns}
+                  />
+                ) : (
+                  <div className="p-8 text-center text-gray-500">
+                    <p>No completed campaigns found for this disaster.</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
