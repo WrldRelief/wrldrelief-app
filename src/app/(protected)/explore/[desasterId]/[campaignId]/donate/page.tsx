@@ -4,16 +4,38 @@ import { DonationAmountSelector } from "@/features/donation/ui/DonationAmountSel
 import { DonationLayout } from "@/features/donation/ui/DonationLayout";
 import { useDonation } from "@/features/donation/model/DonationContext";
 import { useRouter } from "next/navigation";
-import { MOCK_CAMPAIGNS } from "@/entities/campaign";
+import { useCampaign } from "@/entities/contracts/hooks";
+import { Spinner } from "@worldcoin/mini-apps-ui-kit-react";
 
 const DonatePage = () => {
   const { donationState } = useDonation();
   const router = useRouter();
-  const campaign = MOCK_CAMPAIGNS.find(
-    (c) => c.id === donationState.campaignId
-  );
+  const { campaign, loading, error } = useCampaign(donationState.campaignId);
 
-  if (!campaign) return null;
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Spinner />
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error || !campaign) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen p-4 text-center">
+        <h2 className="text-xl font-bold mb-2">Campaign Not Found</h2>
+        <p className="text-gray-500 mb-4">The campaign you&apos;re looking for doesn&apos;t exist or couldn&apos;t be loaded.</p>
+        <button 
+          onClick={() => router.push(`/explore/${donationState.disasterId}`)}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md"
+        >
+          Return to Disaster Page
+        </button>
+      </div>
+    );
+  }
 
   const handleBack = () => {
     router.push(
