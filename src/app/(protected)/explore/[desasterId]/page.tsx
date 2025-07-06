@@ -6,7 +6,7 @@ import { RegionDetail } from "@/widgets/RegionDetail";
 import { Button, Spinner } from "@worldcoin/mini-apps-ui-kit-react";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useDisasterData, extendDisasterData } from "@/entities/disaster/mockData";
+import { useDisasterData, extendDisasterData } from "@/entities/disaster/disasterData";
 import { useState, useEffect } from "react";
 
 const DisasterDetail = () => {
@@ -15,7 +15,7 @@ const DisasterDetail = () => {
   const params = useParams();
   const disasterId = params.desasterId as string;
   
-  const { disasters, loading, error } = useDisasterData();
+  const { data: disasters, isLoading: loading, isError: error } = useDisasterData();
   const [disaster, setDisaster] = useState<DisasterLocationExtended | null>(null);
   const [notFound, setNotFound] = useState(false);
 
@@ -24,7 +24,8 @@ const DisasterDetail = () => {
     if (disasters && disasters.length > 0) {
       const foundDisaster = disasters.find(d => d.id === disasterId);
       if (foundDisaster) {
-        setDisaster(extendDisasterData(foundDisaster));
+        // foundDisaster is already extended, no need to call extendDisasterData again
+        setDisaster(foundDisaster);
       } else {
         setNotFound(true);
       }

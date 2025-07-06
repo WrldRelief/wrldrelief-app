@@ -56,12 +56,31 @@ export function useAllCampaigns() {
       try {
         setLoading(true);
         
-        // Get all campaign IDs from factory
-        const campaignIds = await publicClient.readContract({
+        // Get campaign count first
+        const campaignCount = await publicClient.readContract({
           address: CONTRACT_ADDRESSES.campaignFactory as `0x${string}`,
           abi: CampaignFactoryABI,
-          functionName: 'allCampaignIds',
-        }) as number[];
+          functionName: 'getCampaignCount',
+        }) as bigint;
+        
+        console.log('Campaign count:', campaignCount);
+        
+        // Get all campaign IDs from factory by index
+        const campaignIds = [];
+        for (let i = 0; i < Number(campaignCount); i++) {
+          try {
+            const id = await publicClient.readContract({
+              address: CONTRACT_ADDRESSES.campaignFactory as `0x${string}`,
+              abi: CampaignFactoryABI,
+              functionName: 'allCampaignIds',
+              args: [BigInt(i)],
+            }) as bigint;
+            
+            campaignIds.push(Number(id));
+          } catch (err) {
+            console.error(`Error fetching campaign ID at index ${i}:`, err);
+          }
+        }
         
         // Get campaign info for each ID
         const campaignInfos = await Promise.all(

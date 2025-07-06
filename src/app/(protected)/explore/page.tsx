@@ -8,21 +8,23 @@ import { DisasterFilter } from "@/widgets/DisasterFilter";
 import { useRouter } from "next/navigation";
 import { Page } from "@/features/PageLayout";
 import { TopBar } from "@worldcoin/mini-apps-ui-kit-react";
-import { useDisasterData, extendDisasterData } from "@/entities/disaster/mockData";
+import { useDisasterData } from "@/entities/disaster/disasterData";
 import { useState, useEffect } from "react";
 
 const Explore = () => {
   const router = useRouter();
-  const { disasters: onChainDisasters, loading, error } = useDisasterData();
-  const [disasterLocations, setDisasterLocations] = useState<DisasterLocation[]>([]);
-
-  // Convert on-chain disasters to DisasterLocation format
+  // 수정: useDisasterData 훅에서 이미 확장된 재난 데이터를 직접 사용
+  const { data: disasterLocations, isLoading: loading, isError: error } = useDisasterData();
+  
+  // 디버깅을 위한 로그 추가
   useEffect(() => {
-    if (onChainDisasters && onChainDisasters.length > 0) {
-      const extendedDisasters = onChainDisasters.map(disaster => extendDisasterData(disaster));
-      setDisasterLocations(extendedDisasters);
-    }
-  }, [onChainDisasters]);
+    console.log("재난 데이터 상태:", { 
+      count: disasterLocations?.length || 0, 
+      loading, 
+      error,
+      firstItem: disasterLocations?.[0] 
+    });
+  }, [disasterLocations, loading, error]);
 
   // Use the disaster filtering feature
   const {

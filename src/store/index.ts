@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 import { DisasterLocation } from "@/entities/disaster";
 import { CampaignData } from "@/entities/campaign";
 import { UserInfoExtended } from "@/entities/user/types";
-import { MOCK_DISASTER_LOCATIONS as MOCK_DISASTERS } from "@/entities/disaster/mockData";
+import { MOCK_DISASTER_LOCATIONS as MOCK_DISASTERS } from "@/entities/disaster/disasterData";
 // MOCK_CAMPAIGNS는 제거되고 실제 온체인 데이터로 대체되었습니다.
 
 // Define missing types

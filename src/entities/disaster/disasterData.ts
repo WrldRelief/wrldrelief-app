@@ -1,5 +1,5 @@
-// src/entities/disaster/mockData.ts
-// 이 파일은 목업 데이터를 사용하지 않고 온체인 데이터만 사용합니다.
+// src/entities/disaster/disasterData.ts
+// This file uses on-chain data from smart contracts
 
 import { useAllDisasters, Disaster } from "../contracts";
 import { DisasterLocationExtended } from "./types";
@@ -191,6 +191,5 @@ function getUrgencyLevel(
   return Math.random() > 0.5 ? "medium" : "low";
 }
 
-// 이전 목업 데이터는 제거하고 온체인 데이터만 사용합니다.
-// 하지만 store/index.ts에서 참조하는 MOCK_DISASTER_LOCATIONS는 빈 배열로 유지합니다.
+// 온체인 데이터만 사용하지만 기존 코드와의 호환성을 위해 빈 배열로 유지합니다.
 export const MOCK_DISASTER_LOCATIONS: DisasterLocationExtended[] = [];

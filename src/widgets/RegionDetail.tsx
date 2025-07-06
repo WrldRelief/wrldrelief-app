@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { DisasterLocationExtended } from "@/entities/disaster/types";
 import { CampaignStatus } from "@/entities/campaign/types";
-import { useDisasterCampaigns } from "@/entities/campaign/mockData";
+import { useDisasterCampaigns } from "@/entities/campaign/campaignData";
 import CampaignList from "@/features/CampaignList";
 import { Tabs, TabItem, Spinner } from "@worldcoin/mini-apps-ui-kit-react";
 import { CheckSquare, Donate, WarningCircle } from "iconoir-react";

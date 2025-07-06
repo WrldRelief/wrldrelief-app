@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useCampaignData } from "@/entities/campaign/mockData";
+import { useCampaignData } from "@/entities/campaign/campaignData";
 import { CampaignData, CampaignStatus } from "@/entities/campaign/types";
 import { useRouter } from "next/navigation";
 import { useUserRole } from "@/context/UserRoleContext";
