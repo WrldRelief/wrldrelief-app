@@ -60,7 +60,7 @@ export function useAllCampaigns() {
         const campaignCount = await publicClient.readContract({
           address: CONTRACT_ADDRESSES.campaignFactory as `0x${string}`,
           abi: CampaignFactoryABI,
-          functionName: 'getCampaignCount',
+          functionName: 'getTotalCampaignCount',
         }) as bigint;
         
         console.log('Campaign count:', campaignCount);
