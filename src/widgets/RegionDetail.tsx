@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { DisasterLocationExtended } from "@/entities/disaster/types";
 import { CampaignStatus } from "@/entities/campaign/types";
 import { MOCK_CAMPAIGNS } from "@/entities/campaign";
-import Image from "next/image";
 import CampaignList from "@/features/CampaignList";
 import { Tabs, TabItem } from "@worldcoin/mini-apps-ui-kit-react";
 import { CheckSquare, Donate } from "iconoir-react";
@@ -47,12 +46,10 @@ export const RegionDetail: React.FC<RegionDetailProps> = ({ region }) => {
 
       {/* Region image */}
       <div className="relative w-full min-h-[300px] h-[300px]">
-        <Image
+        <img
           src={region.imageUrl || "/images/default.jpg"}
           alt={`Disaster situation in ${region.name}`}
-          fill
           className="object-cover rounded-lg"
-          priority
         />
       </div>
 

@@ -37,7 +37,10 @@ export function extendDisasterData(disaster: Disaster): DisasterLocationExtended
 /**
  * 재난 이름에서 유형을 추측하는 함수
  */
-function getDisasterType(name: string): "earthquake" | "flood" | "wildfire" | "famine" | "conflict" | "drought" | "typhoon" | "volcano" | "tsunami" | "cyclone" | "storm" | "heatwave" | "economic" | "other" {
+function getDisasterType(name?: string): "earthquake" | "flood" | "wildfire" | "famine" | "conflict" | "drought" | "typhoon" | "volcano" | "tsunami" | "cyclone" | "storm" | "heatwave" | "economic" | "other" {
+  // name이 없으면 기본값으로 'other' 반환
+  if (!name) return 'other';
+  
   const lowerName = name.toLowerCase();
   
   if (lowerName.includes('earthquake')) return 'earthquake';

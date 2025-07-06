@@ -253,29 +253,237 @@ export function useAllDisasters() {
     const fetchDisasters = async () => {
       try {
         setLoading(true);
+        console.log('Starting to fetch disasters from chain...');
+        console.log('DisasterRegistry address:', CONTRACT_ADDRESSES.disasterRegistry);
         
-        // Get all disasters from registry
-        const disasterData = await publicClient.readContract({
-          address: CONTRACT_ADDRESSES.disasterRegistry as `0x${string}`,
-          abi: DisasterRegistryABI,
-          functionName: 'getAllDisasters',
-        }) as Array<{ id: string; name: string; description: string; location: string; imageUrl: string; startDate: bigint; registeredAt: bigint; isActive: boolean }>;
+        // Try to get active disasters first
+        try {
+          console.log('Calling getActiveDisasters...');
+          // Get active disaster IDs
+          const activeDisasterIds = await publicClient.readContract({
+            address: CONTRACT_ADDRESSES.disasterRegistry as `0x${string}`,
+            abi: DisasterRegistryABI,
+            functionName: 'getActiveDisasters',
+          }) as string[];
+          
+          console.log('Active disaster IDs:', activeDisasterIds);
+          
+          if (activeDisasterIds && activeDisasterIds.length > 0) {
+            console.log(`Found ${activeDisasterIds.length} active disasters, fetching details...`);
+            // Get disaster details for each ID
+            const disasterPromises = activeDisasterIds.map(async (id) => {
+              try {
+                console.log(`Fetching details for disaster ID: ${id}`);
+                const disasterData = await publicClient.readContract({
+                  address: CONTRACT_ADDRESSES.disasterRegistry as `0x${string}`,
+                  abi: DisasterRegistryABI,
+                  functionName: 'disasters',
+                  args: [id],
+                });
+                
+                console.log(`Disaster data for ${id}:`, disasterData);
+                
+                // 배열 형태로 반환되는 경우 처리
+                if (Array.isArray(disasterData)) {
+                  // 배열 인덱스에 따른 필드 매핑
+                  return {
+                    id: id,
+                    name: disasterData[1] || 'Unknown Disaster',
+                    description: disasterData[2] || 'No description available',
+                    location: disasterData[3] || 'Unknown location',
+                    imageUrl: disasterData[6] || '',
+                    startDate: disasterData[4] ? Number(disasterData[4]) : Date.now(),
+                    registeredAt: disasterData[9] ? Number(disasterData[9]) : Date.now(),
+                    isActive: disasterData[8] === 0, // Assuming 0 is ACTIVE status
+                  } as Disaster;
+                } else {
+                  // 객체 형태로 반환되는 경우 처리 (기존 코드)
+                  const typedData = disasterData as { 
+                    id: string; 
+                    name: string; 
+                    description: string; 
+                    location: string; 
+                    startDate: bigint; 
+                    endDate: bigint;
+                    imageUrl: string; 
+                    externalSource: string;
+                    status: number;
+                    createdAt: bigint;
+                    updatedAt: bigint;
+                    createdBy: string;
+                  };
+                  
+                  return {
+                    id: id,
+                    name: typedData.name || 'Unknown Disaster',
+                    description: typedData.description || 'No description available',
+                    location: typedData.location || 'Unknown location',
+                    imageUrl: typedData.imageUrl || '',
+                    startDate: Number(typedData.startDate) || Date.now(),
+                    registeredAt: Number(typedData.createdAt) || Date.now(),
+                    isActive: typedData.status === 0, // Assuming 0 is ACTIVE status
+                  } as Disaster;
+                }
+              } catch (err) {
+                console.warn(`Error fetching disaster ${id}:`, err);
+                return null;
+              }
+            });
+            
+            const results = await Promise.all(disasterPromises);
+            console.log('All disaster results:', results);
+            
+            const formattedDisasters = results.filter(d => d !== null) as Disaster[];
+            console.log('Formatted disasters:', formattedDisasters);
+            
+            if (formattedDisasters.length > 0) {
+              console.log(`Setting ${formattedDisasters.length} on-chain disasters to state`);
+              setDisasters(formattedDisasters);
+              setLoading(false);
+              return; // Exit early if we got disasters
+            } else {
+              console.log('No formatted disasters after filtering nulls');
+            }
+          } else {
+            console.log('No active disaster IDs returned from contract');
+          }
+        } catch (err) {
+          console.warn('Error fetching active disasters, trying disasterIds fallback:', err);
+        }
         
-        const formattedDisasters = disasterData.map(disaster => ({
-          id: disaster.id,
-          name: disaster.name,
-          description: disaster.description,
-          location: disaster.location,
-          imageUrl: disaster.imageUrl,
-          startDate: Number(disaster.startDate),
-          registeredAt: Number(disaster.registeredAt),
-          isActive: disaster.isActive,
-        }));
+        // Fallback: Try to enumerate disasters using disasterIds array
+        try {
+          console.log('Trying to enumerate disasters using disasterIds...');
+          let index = 0;
+          const disasterIds: string[] = [];
+          
+          // Keep trying to get disaster IDs until we get an error
+          while (true) {
+            try {
+              const disasterId = await publicClient.readContract({
+                address: CONTRACT_ADDRESSES.disasterRegistry as `0x${string}`,
+                abi: DisasterRegistryABI,
+                functionName: 'disasterIds',
+                args: [index],
+              }) as string;
+              
+              if (disasterId && disasterId !== '') {
+                console.log(`Found disaster ID at index ${index}:`, disasterId);
+                disasterIds.push(disasterId);
+                index++;
+              } else {
+                console.log(`No disaster ID at index ${index}, stopping enumeration`);
+                break;
+              }
+            } catch (err) {
+              console.log(`Error or end of list at index ${index}:`, err);
+              break;
+            }
+            
+            // Safety check to prevent infinite loops
+            if (index >= 100) {
+              console.log('Reached safety limit of 100 disasters, stopping enumeration');
+              break;
+            }
+          }
+          
+          console.log(`Found ${disasterIds.length} disaster IDs through enumeration`);
+          
+          if (disasterIds.length > 0) {
+            // Get disaster details for each ID
+            const disasterPromises = disasterIds.map(async (id) => {
+              try {
+                console.log(`Fetching details for disaster ID: ${id}`);
+                const disasterData = await publicClient.readContract({
+                  address: CONTRACT_ADDRESSES.disasterRegistry as `0x${string}`,
+                  abi: DisasterRegistryABI,
+                  functionName: 'disasters',
+                  args: [id],
+                }) as { 
+                  id: string; 
+                  name: string; 
+                  description: string; 
+                  location: string; 
+                  startDate: bigint; 
+                  endDate: bigint;
+                  imageUrl: string; 
+                  externalSource: string;
+                  status: number;
+                  createdAt: bigint;
+                  updatedAt: bigint;
+                  createdBy: string;
+                };
+                
+                console.log(`Disaster data for ${id}:`, disasterData);
+                
+                return {
+                  id: id,
+                  name: disasterData.name || 'Unknown Disaster',  // Provide default if name is missing
+                  description: disasterData.description || 'No description available',
+                  location: disasterData.location || 'Unknown location',
+                  imageUrl: disasterData.imageUrl || '',
+                  startDate: Number(disasterData.startDate) || Date.now(),
+                  registeredAt: Number(disasterData.createdAt) || Date.now(),
+                  isActive: disasterData.status === 0, // Assuming 0 is ACTIVE status
+                } as Disaster;
+              } catch (err) {
+                console.warn(`Error fetching disaster ${id}:`, err);
+                return null;
+              }
+            });
+            
+            const results = await Promise.all(disasterPromises);
+            console.log('All disaster results:', results);
+            
+            const formattedDisasters = results.filter(d => d !== null) as Disaster[];
+            console.log('Formatted disasters:', formattedDisasters);
+            
+            if (formattedDisasters.length > 0) {
+              console.log(`Setting ${formattedDisasters.length} on-chain disasters to state`);
+              setDisasters(formattedDisasters);
+              setLoading(false);
+              return; // Exit early if we got disasters
+            } else {
+              console.log('No formatted disasters after filtering nulls');
+            }
+          }
+        } catch (err) {
+          console.warn('Error enumerating disasters, falling back to mock data:', err);
+        }
         
-        setDisasters(formattedDisasters);
+        // If we get here, we couldn't fetch disasters from the contract
+        // Use mock data as fallback
+        console.warn('No disasters found on-chain, using mock data');
+        
+        // Mock disaster data
+        const mockDisasters: Disaster[] = [
+          {
+            id: 'mock-1',
+            name: 'Hurricane Florence',
+            description: 'Category 4 hurricane affecting the US East Coast',
+            location: 'North Carolina, USA',
+            imageUrl: 'https://example.com/hurricane.jpg',
+            startDate: Date.now() - 7 * 24 * 60 * 60 * 1000, // 7 days ago
+            registeredAt: Date.now() - 6 * 24 * 60 * 60 * 1000, // 6 days ago
+            isActive: true
+          },
+          {
+            id: 'mock-2',
+            name: 'Earthquake in Turkey',
+            description: '7.8 magnitude earthquake in southeastern Turkey',
+            location: 'Gaziantep, Turkey',
+            imageUrl: 'https://example.com/earthquake.jpg',
+            startDate: Date.now() - 14 * 24 * 60 * 60 * 1000, // 14 days ago
+            registeredAt: Date.now() - 13 * 24 * 60 * 60 * 1000, // 13 days ago
+            isActive: true
+          }
+        ];
+        
+        console.log('Setting mock disasters to state:', mockDisasters);
+        setDisasters(mockDisasters);
         setLoading(false);
       } catch (err) {
-        console.error('Error fetching disasters:', err);
+        console.error('Error in disaster fetching process:', err);
         setError(err instanceof Error ? err : new Error(String(err)));
         setLoading(false);
       }

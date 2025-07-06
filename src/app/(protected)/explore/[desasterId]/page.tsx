@@ -1,26 +1,69 @@
 "use client";
 
-import { MOCK_DISASTER_LOCATIONS } from "@/entities/disaster";
+import { DisasterLocationExtended } from "@/entities/disaster/types";
 import { Page } from "@/features/PageLayout";
 import { RegionDetail } from "@/widgets/RegionDetail";
-import { Button } from "@worldcoin/mini-apps-ui-kit-react";
+import { Button, Spinner } from "@worldcoin/mini-apps-ui-kit-react";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { useDisasterData, extendDisasterData } from "@/entities/disaster/mockData";
+import { useState, useEffect } from "react";
 
 const DisasterDetail = () => {
   const router = useRouter();
   // Get disaster ID from URL params
   const params = useParams();
-  const disasterId = parseInt(params.desasterId as string, 10) || 0;
+  const disasterId = params.desasterId as string;
+  
+  const { disasters, loading, error } = useDisasterData();
+  const [disaster, setDisaster] = useState<DisasterLocationExtended | null>(null);
+  const [notFound, setNotFound] = useState(false);
 
-  // Find the disaster by ID
-  const disaster =
-    MOCK_DISASTER_LOCATIONS.find(
-      (d) => d.id.toString() === disasterId.toString()
-    ) || MOCK_DISASTER_LOCATIONS[0];
+  // Find the disaster by ID from on-chain data
+  useEffect(() => {
+    if (disasters && disasters.length > 0) {
+      const foundDisaster = disasters.find(d => d.id === disasterId);
+      if (foundDisaster) {
+        setDisaster(extendDisasterData(foundDisaster));
+      } else {
+        setNotFound(true);
+      }
+    }
+  }, [disasters, disasterId]);
 
-  // Get disaster name for the title
-  // const disasterName = disaster ? disaster.name : "Disaster Details";
+  // Handle loading and error states
+  if (loading) {
+    return (
+      <Page.Main className="flex flex-col items-center justify-center h-full">
+        <Spinner />
+        <p className="mt-4 text-gray-600">Loading disaster details...</p>
+      </Page.Main>
+    );
+  }
+
+  if (error || notFound || !disaster) {
+    return (
+      <>
+        <Page.Header>
+          <Button
+            onClick={() => router.back()}
+            aria-label="Go back"
+            size="icon"
+            variant="secondary"
+          >
+            ←
+          </Button>
+        </Page.Header>
+        <Page.Main className="flex flex-col items-center justify-center h-full">
+          <h2 className="text-xl font-bold mb-2">Disaster Not Found</h2>
+          <p className="text-gray-600 mb-4">The disaster you're looking for doesn't exist or couldn't be loaded.</p>
+          <Button onClick={() => router.push('/explore')} variant="primary">
+            Return to Explore
+          </Button>
+        </Page.Main>
+      </>
+    );
+  }
 
   return (
     <>
