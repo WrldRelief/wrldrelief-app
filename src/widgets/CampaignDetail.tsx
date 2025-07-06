@@ -38,17 +38,109 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
     ExtendedCampaignData | undefined
   >();
 
+  // Calculate resource needs based on campaign data
+  const calculateResourceNeeds = (campaign: Campaign): Record<string, string | number> => {
+    // Base scale factor determined by campaign name and description
+    let scale = 1.0;
+    
+    // Adjust scale based on campaign name keywords
+    const nameKeywords = {
+      emergency: 1.5,
+      urgent: 1.4,
+      critical: 1.3,
+      relief: 1.2,
+      support: 0.9,
+      rebuild: 0.8,
+      recovery: 0.7,
+    };
+    
+    // Check if campaign name contains any keywords
+    Object.entries(nameKeywords).forEach(([keyword, factor]) => {
+      if (campaign.name.toLowerCase().includes(keyword)) {
+        scale *= factor;
+      }
+    });
+    
+    // Adjust scale based on campaign duration
+    const durationDays = (campaign.endDate - campaign.startDate) / (60 * 60 * 24); // Convert seconds to days
+    if (durationDays < 7) {
+      scale *= 1.5; // Short campaigns need more immediate resources
+    } else if (durationDays > 30) {
+      scale *= 0.8; // Longer campaigns can distribute resources over time
+    }
+    
+    // Determine resource types based on supportItems
+    const resourceTypes = new Set<string>();
+    
+    // Default resources
+    resourceTypes.add('Water');
+    resourceTypes.add('Food');
+    
+    // Add resources based on supportItems
+    if (campaign.supportItems && campaign.supportItems.length > 0) {
+      campaign.supportItems.forEach(item => {
+        const lowerItem = item.toLowerCase();
+        if (lowerItem.includes('medic') || lowerItem.includes('health')) {
+          resourceTypes.add('Medicine');
+        }
+        if (lowerItem.includes('shelter') || lowerItem.includes('housing')) {
+          resourceTypes.add('Shelter');
+        }
+        if (lowerItem.includes('cloth')) {
+          resourceTypes.add('Clothing');
+        }
+        if (lowerItem.includes('hygiene') || lowerItem.includes('sanit')) {
+          resourceTypes.add('Hygiene Kits');
+        }
+        if (lowerItem.includes('tool') || lowerItem.includes('equipment')) {
+          resourceTypes.add('Tools & Equipment');
+        }
+      });
+    }
+    
+    // Calculate specific resource amounts based on scale
+    const resourceNeeds: Record<string, string | number> = {};
+    
+    if (resourceTypes.has('Water')) {
+      resourceNeeds['Water'] = `${Math.round(1000 * scale)} liters`;
+    }
+    
+    if (resourceTypes.has('Food')) {
+      resourceNeeds['Food'] = `${Math.round(500 * scale)} kg`;
+    }
+    
+    if (resourceTypes.has('Medicine')) {
+      resourceNeeds['Medicine'] = `${Math.round(200 * scale)} kits`;
+    }
+    
+    if (resourceTypes.has('Shelter')) {
+      resourceNeeds['Shelter'] = `${Math.round(50 * scale)} units`;
+    }
+    
+    if (resourceTypes.has('Clothing')) {
+      resourceNeeds['Clothing'] = `${Math.round(300 * scale)} sets`;
+    }
+    
+    if (resourceTypes.has('Hygiene Kits')) {
+      resourceNeeds['Hygiene Kits'] = `${Math.round(150 * scale)} kits`;
+    }
+    
+    if (resourceTypes.has('Tools & Equipment')) {
+      resourceNeeds['Tools & Equipment'] = `${Math.round(75 * scale)} sets`;
+    }
+    
+    return resourceNeeds;
+  };
+
   // Update enhanced campaign when blockchain data changes
   useEffect(() => {
     if (campaign) {
+      // Calculate dynamic resource needs based on campaign data
+      const resourceNeeds = calculateResourceNeeds(campaign);
+      
       setEnhancedCampaign({
         ...campaign,
-        resourceNeeds: {
-          Water: "1000 liters",
-          Food: "500 kg",
-          Medicine: "200 kits",
-          Shelter: "50 units",
-        },
+        resourceNeeds,
         currentFunding: campaign.currentFunding || 75000,
         targetFunding: campaign.targetFunding || 100000,
         currency: campaign.currency || "USDC",
@@ -97,14 +189,23 @@ export const CampaignDetail: React.FC<CampaignDetailProps> = ({
 
   // Format date helper function
   const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleDateString();
+    // Convert blockchain timestamp (seconds) to JavaScript timestamp (milliseconds)
+    const milliseconds = timestamp * 1000;
+    return new Date(milliseconds).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   // Calculate days remaining
   const getDaysRemaining = () => {
-    if (new Date(enhancedCampaign.endDate) > new Date()) {
+    // Convert blockchain timestamp (seconds) to JavaScript timestamp (milliseconds)
+    const endDateMilliseconds = enhancedCampaign.endDate * 1000;
+    
+    if (new Date(endDateMilliseconds) > new Date()) {
       return Math.ceil(
-        (new Date(enhancedCampaign.endDate).getTime() - new Date().getTime()) /
+        (new Date(endDateMilliseconds).getTime() - new Date().getTime()) /
           (1000 * 60 * 60 * 24)
       );
     }

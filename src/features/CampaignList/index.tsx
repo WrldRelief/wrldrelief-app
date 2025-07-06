@@ -85,7 +85,7 @@ const CampaignList: React.FC<CampaignListProps> = ({
               <img
                 src={campaign.imageUrl || "/images/default.jpg"}
                 alt={campaign.name}
-                className="object-cover"
+                className="object-cover w-full h-full"
                 onError={(e) => {
                   e.currentTarget.src = "/images/default.jpg";
                 }}
